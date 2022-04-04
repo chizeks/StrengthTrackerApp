@@ -13,11 +13,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StrengthTrackerTheme {
+                // NavController contains methods to change navigation
+                // So if we ever want to navigate within a screen, it must be passed as a parameter
                 val navController = rememberNavController()
+                // NavHost defines all possible screens
                 NavHost(
                     navController = navController,
                     startDestination = Screen.LoginScreen.route
                 ) {
+                    // Each composable() represents a Screen; pass in composable which represent screen
                     composable(route = Screen.LoginScreen.route) {
                         LoginScreen()
                     }
