@@ -3,13 +3,9 @@ package com.company.strengthtracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.*
+import androidx.navigation.compose.rememberNavController
+import com.company.strengthtracker.ui.login_screen.LoginScreen
 import com.company.strengthtracker.ui.theme.StrengthTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,27 +13,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StrengthTrackerTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.LoginScreen.route
                 ) {
-                    Greeting("Android")
+                    composable(route = Screen.LoginScreen.route) {
+                        LoginScreen()
+                    }
+                    composable(route = Screen.RegisterScreen.route) {
+                        // TODO
+                        // PASS IN COMPOSABLE THAT REPRESENTS REGISTER SCREEN
+                    }
                 }
+
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    StrengthTrackerTheme {
-        Greeting("Android")
     }
 }
