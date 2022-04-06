@@ -3,6 +3,7 @@ package com.company.strengthtracker.data.repository
 import com.company.strengthtracker.domain.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,11 +12,17 @@ import javax.inject.Singleton
 // Firebase Sign-in and Sign-out operations, both async
 // Checking authentication
 // Actual implementation of AuthRepository interface
-@Singleton
 @ExperimentalCoroutinesApi
 class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ): AuthRepository {
+    override fun isUserAuthenticatedInFirebase(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun getFirebaseAuthState(): Flow<Boolean> {
+        TODO("Not yet implemented")
+    }
 
 
 }
