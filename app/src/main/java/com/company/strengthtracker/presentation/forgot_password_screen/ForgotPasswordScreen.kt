@@ -1,4 +1,4 @@
-package com.company.strengthtracker.ui.forgot_password_screen
+package com.company.strengthtracker.presentation.forgot_password_screen
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController

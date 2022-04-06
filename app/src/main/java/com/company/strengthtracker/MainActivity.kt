@@ -5,11 +5,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
-import com.company.strengthtracker.ui.forgot_password_screen.ForgotPasswordScreen
-import com.company.strengthtracker.ui.login_screen.LoginScreen
+import com.company.strengthtracker.presentation.forgot_password_screen.ForgotPasswordScreen
+import com.company.strengthtracker.presentation.login_screen.LoginScreen
 import com.company.strengthtracker.ui.register_screen.RegisterScreen
 import com.company.strengthtracker.ui.theme.StrengthTrackerTheme
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
 
+@AndroidEntryPoint
+@InternalCoroutinesApi
+@ExperimentalCoroutinesApi
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

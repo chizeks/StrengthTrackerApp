@@ -1,4 +1,4 @@
-package com.company.strengthtracker.ui.login_screen
+package com.company.strengthtracker.presentation.login_screen
 
 import androidx.compose.foundation.Image
 import com.company.strengthtracker.R
@@ -14,6 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.InternalCoroutinesApi
+import androidx.hilt.navigation.compose.hiltViewModel
+
 
 /*
 
@@ -25,6 +28,7 @@ Has an identifier text field, password text field, register button, and (todo)? 
 @Composable
 fun LoginScreen(
     navController: NavController,
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     /* COLUMNS (Also can use rows) */
     // This column fills all nested composables to the entire size of the screen and centers
