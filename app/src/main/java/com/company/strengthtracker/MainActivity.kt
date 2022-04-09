@@ -7,7 +7,9 @@ import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.company.strengthtracker.presentation.forgot_password_screen.ForgotPasswordScreen
 import com.company.strengthtracker.presentation.login_screen.LoginScreen
-import com.company.strengthtracker.ui.register_screen.RegisterScreen
+import com.company.strengthtracker.presentation.welcome_screen.WelcomeScreen
+import com.company.strengthtracker.presentation.register_screen.RegisterScreen
+
 import com.company.strengthtracker.ui.theme.StrengthTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,7 +30,6 @@ class MainActivity : ComponentActivity() {
                 NavHost(
                     navController = navController,
                     startDestination = Screen.LoginScreen.route
-                    //startDestination = Screen.RegisterScreen.route
                 ) {
                     // Each composable() represents a Screen; pass in composable which represent screen
                     composable(route = Screen.LoginScreen.route) {
@@ -39,6 +40,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(route = Screen.ForgotPasswordScreen.route) {
                         ForgotPasswordScreen(navController = navController)
+                    }
+                    composable(route = Screen.WelcomeScreen.route) {
+                        WelcomeScreen(navController = navController)
                     }
                 }
 
