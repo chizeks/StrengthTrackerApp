@@ -1,9 +1,11 @@
 package com.company.strengthtracker.presentation.login_screen
 
+import android.text.InputType
 import androidx.compose.foundation.Image
 import com.company.strengthtracker.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -13,9 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.InternalCoroutinesApi
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.company.strengthtracker.ui.register_screen.RegisterScreen
+import java.time.format.TextStyle
 
 
 /*
@@ -26,12 +33,14 @@ Has an identifier text field, password text field, register button, and (todo)? 
  */
 
 @Composable
+
 fun LoginScreen(
     navController: NavController,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     /* COLUMNS (Also can use rows) */
     // This column fills all nested composables to the entire size of the screen and centers
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -69,6 +78,8 @@ fun LoginScreen(
                     )
                     TextField(
                         modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         value = userPassText,
                         onValueChange = { userPassText = it },
                         label = { Text("Password") }
@@ -81,7 +92,8 @@ fun LoginScreen(
                             .padding(top = 8.dp),
                         onClick = {
                             // TODO
-                            // Take controller parameter and navigate to a register screen
+                            //Login and go to placeholder screenw
+
                         }
                     ) {
                         Text(
@@ -94,12 +106,14 @@ fun LoginScreen(
                         onClick = {
                             // TODO
                             // Take controller parameter and navigate to a register screen
+                            navController.navigate("register_screen")
                         }
                     ) {
                         Text(
-                            text = "Register"
+                            text = "Create an Account"
                         )
                     }
+
                 }
             }
             Column(

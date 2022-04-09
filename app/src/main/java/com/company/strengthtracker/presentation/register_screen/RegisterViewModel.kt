@@ -1,4 +1,4 @@
-package com.company.strengthtracker.presentation.login_screen
+package com.company.strengthtracker.presentation.register_screen
 
 import androidx.lifecycle.ViewModel
 //import com.company.strengthtracker.domain.use_case.UseCases
@@ -6,8 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class RegisterViewModel @Inject constructor(
   //  private val useCases: UseCases
 ): ViewModel() {
-
 }

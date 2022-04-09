@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/badac/AndroidStudioProjects/StrengthTrackerApp/app/src/main/res/drawable-v24/gradient_start.xml" value="0.1" />
+        <entry key="..\:/Users/badac/AndroidStudioProjects/StrengthTrackerApp/app/src/main/res/drawable/bkgrnd_gradient.xml" value="0.183" />
+        <entry key="..\:/Users/badac/AndroidStudioProjects/StrengthTrackerApp/app/src/main/res/drawable/ic_launcher_background.xml" value="0.183" />
         <entry key="..\:/Users/tylop/GitHub/StrengthTrackerApp/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.212" />
         <entry key="..\:/Users/tylop/GitHub/StrengthTrackerApp/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
       </map>
