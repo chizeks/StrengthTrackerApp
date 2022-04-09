@@ -70,6 +70,7 @@ fun RegisterScreen(
             var newUserId by remember { mutableStateOf("") }
             var newUserPassText by remember { mutableStateOf("") }
             var passConfirmation by remember { mutableStateOf("") }
+            var passErr by remember { mutableStateOf("Create a New Account") }
             var passwordVis by remember { mutableStateOf(false) }
 
             Box(modifier = Modifier.fillMaxWidth(0.5f)) {
@@ -77,6 +78,17 @@ fun RegisterScreen(
                     painter = painterResource(id = R.drawable.gigachad),
                     contentDescription = "Giga Chad"
                 )
+            }
+            Card(modifier = Modifier.fillMaxWidth(0.8f)){
+                Card(modifier = Modifier.fillMaxWidth(0.4f)) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                      Text(text = passErr)
+                    }
+                }
             }
 
             Card(modifier = Modifier.fillMaxWidth(0.8f)) {
@@ -112,7 +124,10 @@ fun RegisterScreen(
                         visualTransformation = if (passwordVis) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         value = newUserPassText,
-                        onValueChange = { newUserPassText = it },
+
+                        onValueChange = {
+                            newUserPassText = it
+                        },
                         label = { Text("Password") }
                     )
                     TextField(
@@ -120,17 +135,25 @@ fun RegisterScreen(
                         visualTransformation = if (passwordVis) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         value = passConfirmation,
-                        onValueChange = { passConfirmation = it },
+                        onValueChange = {
+                            passConfirmation = it
+                        },
                         label = { Text("Confirm password") }
                     )
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            viewModel.registerUser(
-                                email = newUserEmail,
-                                password = newUserPassText,
-                                username = newUserId
-                            )
+                            if (newUserPassText.equals(passConfirmation)) {
+                                viewModel.registerUser(
+                                    email = newUserEmail,
+                                    password = newUserPassText,
+                                    username = newUserId
+                                )
+                            } else {
+                                passErr = "Passwords do not match."
+                                passConfirmation = ""
+                                newUserPassText = ""
+                            }
                         }
 
                     ) {
