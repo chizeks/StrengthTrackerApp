@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.company.strengthtracker.Screen
 
 /*
 
@@ -53,6 +54,12 @@ fun LoginScreen(
                     viewModel.logout()
                 }) {
                     Text("logout")
+                }
+                Button(onClick = {
+                    navController.navigate(Screen.WelcomeScreen.route)
+
+                }) {
+                    Text("Proceed to welcome")
                 }
             }
         }

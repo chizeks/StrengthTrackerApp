@@ -1,11 +1,8 @@
 package com.company.strengthtracker.domain.repository
 
+import com.company.strengthtracker.data.entities.User
 import com.company.strengthtracker.domain.util.Resource
 import com.google.firebase.auth.FirebaseUser
-import dagger.Binds
-import dagger.Provides
-import dagger.hilt.android.scopes.ActivityScoped
-import javax.inject.Inject
 
 interface AuthRepository {
 
@@ -13,7 +10,8 @@ interface AuthRepository {
 
     suspend fun registerUser(
         email: String,
-        password: String
+        password: String,
+        username: String
     ): Resource<Boolean>
 
     suspend fun login(
@@ -22,5 +20,9 @@ interface AuthRepository {
     ): Resource<FirebaseUser?>
 
     suspend fun logout(): Resource<Boolean>
+
+    suspend fun getUserDataFromFirestore(
+        uid: String
+    ): Resource<User?>
 
 }

@@ -1,4 +1,4 @@
-package com.company.strengthtracker.ui.register_screen
+package com.company.strengthtracker.presentation.register_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -19,7 +19,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.company.strengthtracker.R
 import com.company.strengthtracker.Screen
-import com.company.strengthtracker.presentation.login_screen.RegisterViewModel
 
 @Composable
 fun RegisterScreen(
@@ -129,7 +128,8 @@ fun RegisterScreen(
                         onClick = {
                             viewModel.registerUser(
                                 email = newUserEmail,
-                                password = newUserPassText
+                                password = newUserPassText,
+                                username = newUserId
                             )
                         }
 

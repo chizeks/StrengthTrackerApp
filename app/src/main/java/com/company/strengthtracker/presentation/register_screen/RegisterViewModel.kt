@@ -1,18 +1,12 @@
-package com.company.strengthtracker.presentation.login_screen
+package com.company.strengthtracker.presentation.register_screen
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
 import com.company.strengthtracker.domain.util.Resource
-import com.google.firebase.auth.FirebaseAuth
-//import com.company.strengthtracker.domain.use_case.UseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,12 +23,13 @@ class RegisterViewModel @Inject constructor(
 
     fun registerUser(
         email: String,
-        password: String
+        password: String,
+        username: String
     ) {
         isLoading.value = true
 
         viewModelScope.launch {
-            val response = authRepositoryImpl.registerUser(email, password)
+            val response = authRepositoryImpl.registerUser(email, password, username)
             when (response) {
                 is Resource.Success -> {
                     isLoading.value = false
