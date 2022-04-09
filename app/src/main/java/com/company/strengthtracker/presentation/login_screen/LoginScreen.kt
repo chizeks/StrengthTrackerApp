@@ -37,113 +37,122 @@ fun LoginScreen(
 ) {
 
     val isLoading by remember { viewModel.isLoading }
-    val isLoggedIn by remember { viewModel.isLoggedIn }
+    val currentUser by remember { viewModel.currentUser }
     val endReached by remember { viewModel.endReached }
 
-    // Display loading message
-    if (isLoading) {
-        Text("is loading")
-    }
-    // User is already logged-in initially OR logged-in successfully
-    else if (isLoggedIn) {
-        Text("Successful login")
-    }
-    // Login is invalid
-    else if (endReached) {
-        Text("invalid login")
-    }
-    // User is prompted to log-in
-    else {
-        /* COLUMNS (Also can use rows) */
-        // This column fills all nested composables to the entire size of the screen and centers
+    when {
+        // Display loading message
+        isLoading -> {
+            Text("is loading")
+        }
+        // User is already logged-in initially OR logged-in successfully
+        currentUser != null -> {
+            Column {
+                Text("${currentUser!!.email} successful login")
+                Button(onClick = {
+                    viewModel.logout()
+                }) {
+                    Text("logout")
+                }
+            }
+        }
+        // Invalid login attempt
+        currentUser == null && endReached -> {
+            Text("Invalid login attempt")
+        }
+        // Present Login UI to user
+        else -> {
+            /* COLUMNS (Also can use rows) */
+            // This column fills all nested composables to the entire size of the screen and centers
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // This column limits nested composables to 80% of the screen width
             Column(
-                modifier = Modifier.fillMaxWidth(0.8f),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                /* TEXT FIELDS */
-                // On remember mutableStateOf(): https://dev.to/zachklipp/remember-mutablestateof-a-cheat-sheet-10ma
-                var userIdText by remember { mutableStateOf("") }
-                var userPassText by remember { mutableStateOf("") }
-                Box(modifier = Modifier.fillMaxWidth(0.5f)) {
-                    Image(
-                        painter = painterResource(id = R.drawable.gigachad),
-                        contentDescription = "Giga Chad"
-                    )
-                }
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                    ) {
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = userIdText,
-                            onValueChange = { userIdText = it },
-                            label = { Text("UserID") }
-                        )
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                            value = userPassText,
-                            onValueChange = { userPassText = it },
-                            label = { Text("Password") }
-                        )
-                        /* BUTTONS */
-                        // Login
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            onClick = {
-                                viewModel.loginUser(userIdText, userPassText)
-                            }
-                        ) {
-                            Text(
-                                text = "Login"
-                            )
-                        }
-                        // Register
-                        Button(
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = {
-                                // TODO
-                                // Take controller parameter and navigate to a register screen
-                                navController.navigate("register_screen")
-                            }
-                        ) {
-                            Text(
-                                text = "Create an Account"
-                            )
-                        }
-
-                    }
-                }
+                // This column limits nested composables to 80% of the screen width
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Forgot Password
-                    Text(
-                        text = "Forgot Your Password?",
-                        modifier = Modifier.clickable {
-                            // TODO
-                            // Navigate
+                    /* TEXT FIELDS */
+                    // On remember mutableStateOf(): https://dev.to/zachklipp/remember-mutablestateof-a-cheat-sheet-10ma
+                    var userIdText by remember { mutableStateOf("") }
+                    var userPassText by remember { mutableStateOf("") }
+                    Box(modifier = Modifier.fillMaxWidth(0.5f)) {
+                        Image(
+                            painter = painterResource(id = R.drawable.gigachad),
+                            contentDescription = "Giga Chad"
+                        )
+                    }
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                        ) {
+                            TextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = userIdText,
+                                onValueChange = { userIdText = it },
+                                label = { Text("UserID") }
+                            )
+                            TextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                visualTransformation = PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                                value = userPassText,
+                                onValueChange = { userPassText = it },
+                                label = { Text("Password") }
+                            )
+                            /* BUTTONS */
+                            // Login
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                onClick = {
+                                    viewModel.loginUser(userIdText, userPassText)
+                                }
+                            ) {
+                                Text(
+                                    text = "Login"
+                                )
+                            }
+                            // Register
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    // TODO
+                                    // Take controller parameter and navigate to a register screen
+                                    navController.navigate("register_screen")
+                                }
+                            ) {
+                                Text(
+                                    text = "Create an Account"
+                                )
+                            }
+
                         }
-                    )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Forgot Password
+                        Text(
+                            text = "Forgot Your Password?",
+                            modifier = Modifier.clickable {
+                                // TODO
+                                // Navigate
+                            }
+                        )
+                    }
                 }
             }
         }

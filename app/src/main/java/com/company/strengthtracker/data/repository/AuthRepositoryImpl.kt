@@ -38,18 +38,26 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun login(email: String, password: String): Resource<Boolean> {
+    override suspend fun login(email: String, password: String): Resource<FirebaseUser?> {
         return try {
             val response = auth.signInWithEmailAndPassword(
                 email,
                 password
             ).await()
-            println("here response is successful ${response.user}" +
-                    "${response.additionalUserInfo}")
-            if (response.user != null) Resource.Success(true)
-            else Resource.Error("${response}")
+            if (response.user != null) Resource.Success(response.user)
+            else Resource.Error("Error in login")
 
         } catch (e: Exception) {
             Resource.Error("${e.message}")
-        }    }
+        }
+    }
+
+    override suspend fun logout(): Resource<Boolean> {
+        return try {
+            auth.signOut()
+            return Resource.Success(true)
+        }  catch (e: Exception) {
+            Resource.Error("${e.message}")
+        }
+    }
 }

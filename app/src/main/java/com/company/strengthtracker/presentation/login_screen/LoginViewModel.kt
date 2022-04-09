@@ -1,10 +1,13 @@
 package com.company.strengthtracker.presentation.login_screen
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
 import com.company.strengthtracker.domain.util.Resource
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,21 +18,32 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
 
     var isLoading = mutableStateOf(false)
-    var isLoggedIn = mutableStateOf(false)
     var endReached = mutableStateOf(false)
 
+    // Equal to null if not currently logged in
+    var currentUser: MutableState<FirebaseUser?> = mutableStateOf(null)
+
     init {
+        // First thing: check to see if user is already logged in
         isUserLoggedIn()
     }
 
     private fun isUserLoggedIn() {
         isLoading.value = true
         viewModelScope.launch {
-            val result = authRepositoryImpl.getCurrentUser()
-            println("here result is ${result?.uid}")
+            currentUser.value  = authRepositoryImpl.getCurrentUser()
             isLoading.value = false
-            if (result == null)
-                isLoggedIn.value = false
+        }
+    }
+
+
+    fun logout() {
+        isLoading.value = true
+        viewModelScope.launch {
+            authRepositoryImpl.logout()
+            currentUser.value  = authRepositoryImpl.getCurrentUser()
+            isLoading.value = false
+            endReached.value = false
         }
     }
 
@@ -44,12 +58,12 @@ class LoginViewModel @Inject constructor(
                 email = email,
                 password = password
             )
-            println("here ${response.message}")
-            println("here ${response.data}")
+
+            // Update current user
+            currentUser.value = response.data
             when (response) {
                 is Resource.Success -> {
                     isLoading.value = false
-                    isLoggedIn.value = true
                     endReached.value = true
                 }
                 is Resource.Error -> {

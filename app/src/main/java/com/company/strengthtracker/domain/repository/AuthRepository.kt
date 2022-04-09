@@ -19,7 +19,8 @@ interface AuthRepository {
     suspend fun login(
         email: String,
         password: String
-    ): Resource<Boolean>
+    ): Resource<FirebaseUser?>
 
+    suspend fun logout(): Resource<Boolean>
 
 }
