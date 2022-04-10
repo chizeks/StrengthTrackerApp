@@ -29,13 +29,7 @@ class WelcomeViewModel @Inject constructor(
     var currentFirebaseUser: MutableState<FirebaseUser?> = mutableStateOf(null)
     var currentUser: MutableState<User?> = mutableStateOf(null)
 
-    init {
-        println("init invoked in welcome view model")
-        // First thing: check to see if user is already logged in
-        getCurrentUserFromCollections()
-    }
-
-    private fun getCurrentUserFromCollections() {
+    fun getCurrentUserFromCollections() {
 
         welcomeScreenState.value = WelcomeScreenState.LOADING
 

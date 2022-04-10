@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.company.strengthtracker.data.entities.User
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
 import com.company.strengthtracker.domain.util.Resource
@@ -20,7 +21,7 @@ class LoginViewModel @Inject constructor(
 
     // Possible states that this screen should take
     enum class LoginScreenState {
-        LAUNCH, LOADING, LOGIN_SUCCESS, LOGIN_FAILURE
+        LAUNCH, STANDBY, LOADING, LOGIN_SUCCESS, LOGIN_FAILURE
     }
 
     // Referenced in LoginScreen to determine which UI should be presented to user
@@ -29,14 +30,10 @@ class LoginViewModel @Inject constructor(
     // Equal to null if not currently logged in
     var currentUser: MutableState<FirebaseUser?> = mutableStateOf(null)
 
-    init {
-        println("Init invoked in login screen")
-        // First thing: check to see if user is already logged in
-        isUserLoggedIn()
-    }
+
 
     // Invoked on initialization to determine if user is already logged-in
-    private fun isUserLoggedIn() {
+    fun isUserLoggedIn() {
         println("Is used logged in invoked")
         loginScreenState.value = LoginScreenState.LOADING
 
@@ -44,7 +41,7 @@ class LoginViewModel @Inject constructor(
             currentUser.value = authRepositoryImpl.getCurrentUser()
             loginScreenState.value =
                 if (currentUser.value == null)
-                    LoginScreenState.LAUNCH else LoginScreenState.LOGIN_SUCCESS
+                    LoginScreenState.STANDBY else LoginScreenState.LOGIN_SUCCESS
         }
     }
 
@@ -69,4 +66,6 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+
 }

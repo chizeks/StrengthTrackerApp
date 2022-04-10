@@ -37,9 +37,11 @@ fun RegisterScreen(
             Column {
                 Text(text = "successful registration")
                 Button(onClick = {
-                    navController.popBackStack(Screen.RegisterScreen.route, true)
-                    navController.navigate(Screen.LoginScreen.route)
-                    viewModel.reset() // If we go back in the stack make sure we return to a new registration
+                    navController.navigate(Screen.LoginScreen.route) {
+                        popUpTo(Screen.LoginScreen.route) {
+                            inclusive = true
+                        }
+                    }
                 }) {
                     Text("click to return to login screen")
                 }
