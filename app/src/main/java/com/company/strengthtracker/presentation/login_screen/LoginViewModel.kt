@@ -18,8 +18,13 @@ class LoginViewModel @Inject constructor(
     private val authRepositoryImpl: AuthRepositoryImpl
 ) : ViewModel() {
 
-    var isLoading = mutableStateOf(false)
-    var endReached = mutableStateOf(false)
+    // Possible states that this screen should take
+    enum class LoginScreenState {
+        LAUNCH, LOADING, LOGIN_SUCCESS, LOGIN_FAILURE
+    }
+
+    // Referenced in LoginScreen to determine which UI should be presented to user
+    var loginScreenState = mutableStateOf(LoginScreenState.LAUNCH)
 
     // Equal to null if not currently logged in
     var currentUser: MutableState<FirebaseUser?> = mutableStateOf(null)
@@ -29,31 +34,24 @@ class LoginViewModel @Inject constructor(
         isUserLoggedIn()
     }
 
+    // Invoked on initialization to determine if user is already logged-in
     private fun isUserLoggedIn() {
-        isLoading.value = true
+        loginScreenState.value = LoginScreenState.LOADING
+
         viewModelScope.launch {
-            currentUser.value  = authRepositoryImpl.getCurrentUser()
-            isLoading.value = false
+            currentUser.value = authRepositoryImpl.getCurrentUser()
+            loginScreenState.value =
+                if (currentUser.value == null)
+                    LoginScreenState.LAUNCH else LoginScreenState.LOGIN_SUCCESS
         }
     }
 
-
-    fun logout() {
-        isLoading.value = true
-        viewModelScope.launch {
-            authRepositoryImpl.logout()
-            currentUser.value  = authRepositoryImpl.getCurrentUser()
-            isLoading.value = false
-            endReached.value = false
-        }
-    }
-
-
+    // Invoked by user to attempt a login
     fun loginUser(
         email: String,
         password: String
     ) {
-        isLoading.value = true
+        loginScreenState.value = LoginScreenState.LOADING
 
         viewModelScope.launch {
             val response = authRepositoryImpl.login(
@@ -63,15 +61,9 @@ class LoginViewModel @Inject constructor(
 
             // Update current user
             currentUser.value = response.data
-            when (response) {
-                is Resource.Success -> {
-                    isLoading.value = false
-                    endReached.value = true
-                }
-                is Resource.Error -> {
-                    isLoading.value = false
-                    endReached.value = true
-                }
+            loginScreenState.value = when (response) {
+                is Resource.Success -> LoginScreenState.LOGIN_SUCCESS
+                is Resource.Error -> LoginScreenState.LOGIN_FAILURE
             }
         }
     }
