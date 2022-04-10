@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.company.strengthtracker.Screen
+import com.company.strengthtracker.presentation.login_screen.LoginViewModel.LoginScreenState.*
 
 /*
 
@@ -37,38 +38,24 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
 
-    val isLoading by remember { viewModel.isLoading }
-    val currentUser by remember { viewModel.currentUser }
-    val endReached by remember { viewModel.endReached }
+    val loginScreenState by remember { viewModel.loginScreenState }
 
-    when {
+    when (loginScreenState) {
         // Display loading message
-        isLoading -> {
+        LOADING -> {
             Text("is loading")
         }
         // User is already logged-in initially OR logged-in successfully
-        currentUser != null -> {
-            Column {
-                Text("${currentUser!!.email} successful login")
-                Button(onClick = {
-                    viewModel.logout()
-                }) {
-                    Text("logout")
-                }
-                Button(onClick = {
-                    navController.navigate(Screen.WelcomeScreen.route)
-
-                }) {
-                    Text("Proceed to welcome")
-                }
-            }
+        LOGIN_SUCCESS -> {
+            navController.popBackStack(Screen.LoginScreen.route, true)
+            navController.navigate(Screen.WelcomeScreen.route)
         }
         // Invalid login attempt
-        currentUser == null && endReached -> {
+        LOGIN_FAILURE -> {
             Text("Invalid login attempt")
         }
         // Present Login UI to user
-        else -> {
+        LAUNCH -> {
             /* COLUMNS (Also can use rows) */
             // This column fills all nested composables to the entire size of the screen and centers
 

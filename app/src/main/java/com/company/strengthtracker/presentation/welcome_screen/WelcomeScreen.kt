@@ -1,25 +1,13 @@
 package com.company.strengthtracker.presentation.welcome_screen
 
-import androidx.compose.foundation.Image
-import com.company.strengthtracker.R
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
-import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.company.strengthtracker.Screen
-import com.company.strengthtracker.presentation.login_screen.LoginViewModel
+import com.company.strengthtracker.presentation.welcome_screen.WelcomeViewModel.WelcomeScreenState.*
 
 /*
 
@@ -32,30 +20,40 @@ fun WelcomeScreen(
     viewModel: WelcomeViewModel = hiltViewModel()
 ) {
 
+    val welcomeScreenState by remember { viewModel.welcomeScreenState }
 
-    val isLoading by remember { viewModel.isLoading }
+    // User Entity from users collection
     val currentUser by remember { viewModel.currentUser }
-    val endReached by remember { viewModel.endReached }
-    val hasError by remember { viewModel.hasError }
 
-    when {
+    when (welcomeScreenState) {
         // Display loading message
-        isLoading -> {
-            Text("is loading")
+        LOADING -> {
+            Text("is loading welcome screen")
         }
         // User is already logged-in initially OR logged-in successfully
-        hasError -> {
-            Text("Error occured")
+        ERROR -> {
+            Text("Error occurred")
         }
-        currentUser != null -> {
+        CONNECTED -> {
             Column {
                 Text(currentUser!!.email)
                 Text(currentUser!!.uid)
                 Text(currentUser!!.username)
+                Button(
+                    onClick = { viewModel.logout() }
+                ) {
+                    Text("Logout")
+                }
             }
         }
-        endReached -> {
-            Text("bruh not sure if this is reachable")
+        // Disconnected, return to login-screen
+        DISCONNECTED -> {
+            navController.popBackStack(Screen.WelcomeScreen.route, true)
+            navController.navigate(Screen.LoginScreen.route)
+        }
+        // This currently shouldn't ever happen - probably remove in future
+        LAUNCH -> {
+
         }
     }
 }
