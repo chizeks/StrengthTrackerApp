@@ -95,6 +95,7 @@ fun RegisterScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+<<<<<<< Updated upstream
                 var newUserEmail by remember { mutableStateOf("") }
                 var newUserDob by remember { mutableStateOf("") }
                 var newUserId by remember { mutableStateOf("") }
@@ -107,6 +108,35 @@ fun RegisterScreen(
                     Image(
                         painter = painterResource(id = R.drawable.gigachad),
                         contentDescription = "Giga Chad"
+=======
+            Card(modifier = Modifier.fillMaxWidth(0.8f)) {
+                Column(
+                    modifier = Modifier.padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        value = newUserDob,
+                        onValueChange = { newUserDob = it },
+                        label = { Text("Date of birth") }
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        value = newUserEmail,
+                        onValueChange = { newUserEmail = it
+                                        },
+                        label = { Text("Email") }
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = newUserId,
+                        onValueChange = { newUserId = it
+                                        },
+                        label = { Text("Username") }
+>>>>>>> Stashed changes
                     )
                 }
 
@@ -147,6 +177,7 @@ fun RegisterScreen(
                         onValueChange = {
                             newUserPassText = it
                         },
+                        trailingIcon = { },
                         label = { Text("Password") }
                     )
                     TextField(
