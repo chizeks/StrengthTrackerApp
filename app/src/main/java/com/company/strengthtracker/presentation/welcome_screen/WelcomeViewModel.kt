@@ -17,36 +17,50 @@ class WelcomeViewModel @Inject constructor(
     private val authRepositoryImpl: AuthRepositoryImpl
 ) : ViewModel() {
 
-    var isLoading = mutableStateOf(false)
-    var endReached = mutableStateOf(false)
-    var hasError = mutableStateOf(false)
+    // Possible states that this screen should take
+    enum class WelcomeScreenState {
+        LAUNCH, LOADING, CONNECTED, ERROR, DISCONNECTED
+    }
+
+    // Referenced in WelcomeScreen to determine which UI should be presented to user
+    var welcomeScreenState = mutableStateOf(WelcomeScreenState.LAUNCH)
 
     // Equal to null if not currently logged in
     var currentFirebaseUser: MutableState<FirebaseUser?> = mutableStateOf(null)
     var currentUser: MutableState<User?> = mutableStateOf(null)
 
-    init {
-        // First thing: check to see if user is already logged in
-        getCurrentUserFromCollections()
-    }
+    fun getCurrentUserFromCollections() {
 
-    private fun getCurrentUserFromCollections() {
-        isLoading.value = true
+        welcomeScreenState.value = WelcomeScreenState.LOADING
+
         viewModelScope.launch {
+
             currentFirebaseUser.value = authRepositoryImpl.getCurrentUser()
             val response = authRepositoryImpl
                 .getUserDataFromFirestore(currentFirebaseUser.value!!.uid)
-            when (response) {
+
+            println("Here $response")
+           welcomeScreenState.value = when (response) {
                 is Resource.Success -> {
                     currentUser.value = response.data
-                    endReached.value = true
+                    WelcomeScreenState.CONNECTED
                 }
                 is Resource.Error -> {
-                    hasError.value = true
-                    endReached.value = true
+                    WelcomeScreenState.ERROR
                 }
             }
-            isLoading.value = false
+
+
+        }
+    }
+
+    // Invoked on an already logged-in user to log-out; may remove later
+    fun logout() {
+        welcomeScreenState.value = WelcomeScreenState.LOADING
+        viewModelScope.launch {
+            authRepositoryImpl.logout()
+            currentUser.value = null
+            welcomeScreenState.value = WelcomeScreenState.DISCONNECTED
         }
     }
 }
