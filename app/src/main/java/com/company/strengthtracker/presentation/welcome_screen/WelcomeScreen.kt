@@ -48,12 +48,18 @@ fun WelcomeScreen(
         }
         // Disconnected, return to login-screen
         DISCONNECTED -> {
-            navController.popBackStack(Screen.WelcomeScreen.route, true)
-            navController.navigate(Screen.LoginScreen.route)
+            LaunchedEffect(Unit) {
+                navController.navigate(Screen.LoginScreen.route) {
+                    popUpTo(Screen.WelcomeScreen.route) {
+                        inclusive = true
+                    }
+                }
+            }
         }
         // This currently shouldn't ever happen - probably remove in future
         LAUNCH -> {
-
+                viewModel.getCurrentUserFromCollections()
         }
+
     }
 }

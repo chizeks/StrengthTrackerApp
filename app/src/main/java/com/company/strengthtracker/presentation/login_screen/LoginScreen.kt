@@ -38,6 +38,7 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
 
+
     val loginScreenState by remember { viewModel.loginScreenState }
 
     when (loginScreenState) {
@@ -47,15 +48,22 @@ fun LoginScreen(
         }
         // User is already logged-in initially OR logged-in successfully
         LOGIN_SUCCESS -> {
-            navController.popBackStack(Screen.LoginScreen.route, true)
-            navController.navigate(Screen.WelcomeScreen.route)
+            LaunchedEffect(Unit) {
+                if (navController.currentBackStackEntry?.destination?.route == Screen.LoginScreen.route)
+                    navController.navigate(Screen.WelcomeScreen.route) {
+                        popUpTo(Screen.LoginScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                else navController.navigate(Screen.WelcomeScreen.route)
+            }
         }
         // Invalid login attempt
         LOGIN_FAILURE -> {
             Text("Invalid login attempt")
         }
         // Present Login UI to user
-        LAUNCH -> {
+        STANDBY -> {
             /* COLUMNS (Also can use rows) */
             // This column fills all nested composables to the entire size of the screen and centers
 
@@ -123,6 +131,7 @@ fun LoginScreen(
                                     // TODO
                                     // Take controller parameter and navigate to a register screen
                                     navController.navigate("register_screen")
+                                    viewModel.loginScreenState.value = LAUNCH
                                 }
                             ) {
                                 Text(
@@ -149,6 +158,9 @@ fun LoginScreen(
                     }
                 }
             }
+        }
+        LAUNCH -> {
+            viewModel.isUserLoggedIn()
         }
     }
 }
