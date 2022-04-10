@@ -19,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.company.strengthtracker.R
 import com.company.strengthtracker.Screen
+import com.company.strengthtracker.presentation.register_screen.RegisterViewModel.RegisterScreenState.*
 
 @Composable
 fun RegisterScreen(
@@ -26,119 +27,121 @@ fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
 
-    val isLoading by remember { viewModel.isLoading }
-    val endReached by remember { viewModel.endReached }
-    val error by remember { viewModel.hasError }
-    val message by remember { viewModel.message }
+    val screenState by remember { viewModel.registerScreenState }
 
-    // They pushed register and the view model is now loading
-    if (isLoading) {
-        Text(text = message + " is loading")
-    }
-    // Error in registration
-    // Inform user why and prompt them to register again
-    else if (endReached && error) {
-        Text(text = message + " end reached")
-        Button(onClick = {
-            viewModel.reset()
-        }) {
-            Text("click to reset")
+    when (screenState) {
+        LOADING -> {
+            Text(text = "LOADING")
         }
-    }
-    // Successful registration
-    // Should navigate user back to login screen
-    else if (endReached && !error) {
-        Text(text = message + " successful registration")
-        Button(onClick = {
-            navController.navigate(Screen.LoginScreen.route)
-        }) {
-            Text("click to return to login screen")
-        }
-    }
-    // Else, present initial registration UI
-    else
-    /* COLUMNS */
-    // This column fills all nested composables to the entire size of the screen and centers
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            var newUserEmail by remember { mutableStateOf("") }
-            var newUserDob by remember { mutableStateOf("") }
-            var newUserId by remember { mutableStateOf("") }
-            var newUserPassText by remember { mutableStateOf("") }
-            var passConfirmation by remember { mutableStateOf("") }
-            var passwordVis by remember { mutableStateOf(false) }
-
-            Box(modifier = Modifier.fillMaxWidth(0.5f)) {
-                Image(
-                    painter = painterResource(id = R.drawable.gigachad),
-                    contentDescription = "Giga Chad"
-                )
-            }
-
-            Card(modifier = Modifier.fillMaxWidth(0.8f)) {
-                Column(
-                    modifier = Modifier.padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    TextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        value = newUserDob,
-                        onValueChange = { newUserDob = it },
-                        label = { Text("Date of birth") }
-                    )
-                    TextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        value = newUserEmail,
-                        onValueChange = { newUserEmail = it },
-                        label = { Text("Email") }
-                    )
-                    TextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = newUserId,
-                        onValueChange = { newUserId = it },
-                        label = { Text("Username") }
-                    )
-
-
-                    TextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        visualTransformation = if (passwordVis) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        value = newUserPassText,
-                        onValueChange = { newUserPassText = it },
-                        label = { Text("Password") }
-                    )
-                    TextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        visualTransformation = if (passwordVis) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        value = passConfirmation,
-                        onValueChange = { passConfirmation = it },
-                        label = { Text("Confirm password") }
-                    )
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            viewModel.registerUser(
-                                email = newUserEmail,
-                                password = newUserPassText,
-                                username = newUserId
-                            )
-                        }
-
-                    ) {
-                        Text(text = "Create Account")
-                    }
-
+        REGISTER_SUCCESS -> {
+            Column {
+                Text(text = "successful registration")
+                Button(onClick = {
+                    navController.popBackStack(Screen.RegisterScreen.route, true)
+                    navController.navigate(Screen.LoginScreen.route)
+                    viewModel.reset() // If we go back in the stack make sure we return to a new registration
+                }) {
+                    Text("click to return to login screen")
                 }
             }
         }
+        REGISTER_ERROR -> {
+            Column {
+                Text(text = "ERROR")
+                Button(onClick = {
+                    viewModel.reset()
+                }) {
+                    Text("click to reset")
+                }
+            }
+        }
+        // Present registration UI
+        LAUNCH -> {
+
+            /* COLUMNS */
+            // This column fills all nested composables to the entire size of the screen and centers
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                var newUserEmail by remember { mutableStateOf("") }
+                var newUserDob by remember { mutableStateOf("") }
+                var newUserId by remember { mutableStateOf("") }
+                var newUserPassText by remember { mutableStateOf("") }
+                var passConfirmation by remember { mutableStateOf("") }
+                var passwordVis by remember { mutableStateOf(false) }
+
+                Box(modifier = Modifier.fillMaxWidth(0.5f)) {
+                    Image(
+                        painter = painterResource(id = R.drawable.gigachad),
+                        contentDescription = "Giga Chad"
+                    )
+                }
+
+                Card(modifier = Modifier.fillMaxWidth(0.8f)) {
+                    Column(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            value = newUserDob,
+                            onValueChange = { newUserDob = it },
+                            label = { Text("Date of birth") }
+                        )
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            value = newUserEmail,
+                            onValueChange = { newUserEmail = it },
+                            label = { Text("Email") }
+                        )
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = newUserId,
+                            onValueChange = { newUserId = it },
+                            label = { Text("Username") }
+                        )
+
+
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            visualTransformation = if (passwordVis) VisualTransformation.None else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            value = newUserPassText,
+                            onValueChange = { newUserPassText = it },
+                            label = { Text("Password") }
+                        )
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            visualTransformation = if (passwordVis) VisualTransformation.None else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            value = passConfirmation,
+                            onValueChange = { passConfirmation = it },
+                            label = { Text("Confirm password") }
+                        )
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                viewModel.registerUser(
+                                    email = newUserEmail,
+                                    password = newUserPassText,
+                                    username = newUserId
+                                )
+                            }
+
+                        ) {
+                            Text(text = "Create Account")
+                        }
+
+                    }
+                }
+            }
+        }
+    }
 }
 

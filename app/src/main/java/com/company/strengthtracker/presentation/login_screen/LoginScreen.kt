@@ -47,11 +47,8 @@ fun LoginScreen(
         }
         // User is already logged-in initially OR logged-in successfully
         LOGIN_SUCCESS -> {
-            navController.navigate(Screen.WelcomeScreen.route) {
-                popUpTo(Screen.LoginScreen.route) {
-                    inclusive = true
-                }
-            }
+            navController.popBackStack(Screen.LoginScreen.route, true)
+            navController.navigate(Screen.WelcomeScreen.route)
         }
         // Invalid login attempt
         LOGIN_FAILURE -> {

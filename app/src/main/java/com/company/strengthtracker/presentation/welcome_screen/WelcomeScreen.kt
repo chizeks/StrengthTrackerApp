@@ -48,11 +48,8 @@ fun WelcomeScreen(
         }
         // Disconnected, return to login-screen
         DISCONNECTED -> {
-            navController.navigate(Screen.LoginScreen.route) {
-                popUpTo(Screen.WelcomeScreen.route) {
-                    inclusive = true
-                }
-            }
+            navController.popBackStack(Screen.WelcomeScreen.route, true)
+            navController.navigate(Screen.LoginScreen.route)
         }
         // This currently shouldn't ever happen - probably remove in future
         LAUNCH -> {

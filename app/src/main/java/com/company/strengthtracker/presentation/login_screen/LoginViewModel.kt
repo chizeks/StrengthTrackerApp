@@ -30,12 +30,14 @@ class LoginViewModel @Inject constructor(
     var currentUser: MutableState<FirebaseUser?> = mutableStateOf(null)
 
     init {
+        println("Init invoked in login screen")
         // First thing: check to see if user is already logged in
         isUserLoggedIn()
     }
 
     // Invoked on initialization to determine if user is already logged-in
     private fun isUserLoggedIn() {
+        println("Is used logged in invoked")
         loginScreenState.value = LoginScreenState.LOADING
 
         viewModelScope.launch {

@@ -14,40 +14,31 @@ class RegisterViewModel @Inject constructor(
     private val authRepositoryImpl: AuthRepositoryImpl
 ) : ViewModel() {
 
-    // Are we currently making an active async call?
-    var isLoading = mutableStateOf(false)
-    // Are we at the end-state of an async call?
-    var endReached = mutableStateOf(false)
-    var message = mutableStateOf("")
-    var hasError = mutableStateOf(false)
+    // Possible states that this screen should take
+    enum class RegisterScreenState {
+        LAUNCH, LOADING, REGISTER_SUCCESS, REGISTER_ERROR
+    }
+
+    // Referenced in screen to determine which UI should be presented to user
+    var registerScreenState = mutableStateOf(RegisterScreenState.LAUNCH)
 
     fun registerUser(
         email: String,
         password: String,
         username: String
     ) {
-        isLoading.value = true
+        registerScreenState.value = RegisterScreenState.LOADING
 
         viewModelScope.launch {
             val response = authRepositoryImpl.registerUser(email, password, username)
-            when (response) {
-                is Resource.Success -> {
-                    isLoading.value = false
-                    endReached.value = true
-                    hasError.value = false
-                }
-                is Resource.Error -> {
-                    isLoading.value = false
-                    endReached.value = true
-                    hasError.value = true
-                }
+            registerScreenState.value = when (response) {
+                is Resource.Success -> RegisterScreenState.REGISTER_SUCCESS
+                is Resource.Error -> RegisterScreenState.REGISTER_ERROR
             }
         }
     }
 
     fun reset() {
-        isLoading.value = false
-        endReached.value = false
-        hasError.value = false
+        registerScreenState.value = RegisterScreenState.LAUNCH
     }
 }
