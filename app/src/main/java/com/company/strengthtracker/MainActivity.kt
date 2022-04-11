@@ -3,12 +3,14 @@ package com.company.strengthtracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.company.strengthtracker.presentation.forgot_password_screen.ForgotPasswordScreen
 import com.company.strengthtracker.presentation.login_screen.LoginScreen
 import com.company.strengthtracker.presentation.welcome_screen.WelcomeScreen
 import com.company.strengthtracker.presentation.register_screen.RegisterScreen
+import com.company.strengthtracker.presentation.template_day_screen.DayScreen
 
 import com.company.strengthtracker.ui.theme.StrengthTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,6 +21,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @InternalCoroutinesApi
 @ExperimentalCoroutinesApi
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -29,7 +32,7 @@ class MainActivity : ComponentActivity() {
                 // NavHost defines all possible screens
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.LoginScreen.route
+                    startDestination = Screen.DayScreen.route
                 ) {
                     // Each composable() represents a Screen; pass in composable which represent screen
                     composable(route = Screen.LoginScreen.route) {
@@ -43,6 +46,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(route = Screen.WelcomeScreen.route) {
                         WelcomeScreen(navController = navController)
+                    }
+                    composable(route = Screen.DayScreen.route) {
+                        DayScreen(navController = navController,)
                     }
                 }
 
