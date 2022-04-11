@@ -2,9 +2,10 @@ package com.company.strengthtracker.data.entities.exercise_data.exercise_definit
 
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
 
-class Planche (
+class FrontLever (
+
+    override val name: String = "Front Lever"
 ): Statics() {
-    override val name:String = "Planche"
     override var aid: String = ""
     override var holdTime: String = ""
     override var weight: String = ""
