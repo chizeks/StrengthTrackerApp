@@ -280,7 +280,7 @@ fun DayScreen(
                         var progression by remember { mutableStateOf(movement.progression) }
 
                         TextField(
-                            modifier = Modifier.fillMaxWidth().,
+                            modifier = Modifier.fillMaxWidth(),
                             value = sHoldTime,
                             onValueChange = {
                                 sHoldTime = it
