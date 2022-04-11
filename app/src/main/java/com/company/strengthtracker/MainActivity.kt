@@ -3,6 +3,7 @@ package com.company.strengthtracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.company.strengthtracker.presentation.forgot_password_screen.ForgotPasswordScreen
@@ -20,6 +21,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @InternalCoroutinesApi
 @ExperimentalCoroutinesApi
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -46,7 +48,7 @@ class MainActivity : ComponentActivity() {
                         WelcomeScreen(navController = navController)
                     }
                     composable(route = Screen.DayScreen.route) {
-                        DayScreen(navController = navController)
+                        DayScreen(navController = navController,)
                     }
                 }
 
