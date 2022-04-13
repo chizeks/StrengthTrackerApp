@@ -10,9 +10,8 @@ interface AuthRepository {
 
     suspend fun registerUser(
         email: String,
-        password: String,
-        username: String
-    ): Resource<Boolean>
+        password: String
+    ): Resource<String>
 
     suspend fun login(
         email: String,
@@ -20,9 +19,5 @@ interface AuthRepository {
     ): Resource<FirebaseUser?>
 
     suspend fun logout(): Resource<Boolean>
-
-    suspend fun getUserDataFromFirestore(
-        uid: String
-    ): Resource<User?>
 
 }

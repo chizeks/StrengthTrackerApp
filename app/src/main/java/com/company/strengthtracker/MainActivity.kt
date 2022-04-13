@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
                 // NavHost defines all possible screens
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.DayScreen.route
+                    startDestination = Screen.LoginScreen.route
                 ) {
                     // Each composable() represents a Screen; pass in composable which represent screen
                     composable(route = Screen.LoginScreen.route) {
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                         WelcomeScreen(navController = navController)
                     }
                     composable(route = Screen.DayScreen.route) {
-                        DayScreen(navController = navController,)
+                        DayScreen(navController = navController)
                     }
                 }
 
