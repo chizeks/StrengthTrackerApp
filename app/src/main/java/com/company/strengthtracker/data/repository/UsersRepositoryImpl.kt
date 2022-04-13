@@ -37,7 +37,7 @@ class UsersRepositoryImpl @Inject constructor(
     override suspend fun updateUserUsernameByUid(uid: String, username: String) {
         // https://firebase.google.com/docs/firestore/manage-data/add-data#kotlin+ktx
         val data = hashMapOf("username" to username)
-        usersCollection.document(uid).set(data).await()
+        usersCollection.document(uid).update(data as Map<String, Any>).await()
     }
 
     override suspend fun deleteUserByUid(uid: String) {
