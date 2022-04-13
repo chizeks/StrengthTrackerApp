@@ -13,16 +13,10 @@ class UsersRepositoryImpl @Inject constructor(
 
     override suspend fun getUserByUid(uid: String): Resource<User?> {
         return try {
-            val response = usersCollection.whereEqualTo(
-                "uid",
-                uid
-            ).get().await()
-            if (response != null && !response.isEmpty) {
-                for (document in response.documents) {
-                    val user = document.toObject(User::class.java)
+            val response = usersCollection.document(uid).get().await()
+            if (response != null) {
+                    val user = response.toObject(User::class.java)
                     return Resource.Success(data = user)
-                }
-                return Resource.Error("Error in login")
             } else Resource.Error("Error in login")
 
         } catch (e: Exception) {
