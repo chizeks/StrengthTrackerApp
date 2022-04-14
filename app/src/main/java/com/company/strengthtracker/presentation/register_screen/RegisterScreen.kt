@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -160,7 +161,8 @@ fun RegisterScreen(
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
-                                if (newUserPassText.equals(passConfirmation)) {
+                                if (newUserPassText == passConfirmation) {
+                                    //viewModel.checkPass(newUserPassText)
                                     viewModel.registerUser(
                                         email = newUserEmail,
                                         password = newUserPassText,

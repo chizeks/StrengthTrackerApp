@@ -9,6 +9,8 @@ import com.company.strengthtracker.data.repository.UsersRepositoryImpl
 import com.company.strengthtracker.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,6 +50,20 @@ class RegisterViewModel @Inject constructor(
                 is Resource.Error -> RegisterScreenState.REGISTER_ERROR
             }
         }
+    }
+
+    fun checkPass(
+        password: String
+    ): Boolean {
+        var pattern: Pattern
+        var matcher: Matcher
+
+        val password_pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{4,}$"
+
+        pattern = Pattern.compile(password_pattern)
+        matcher = pattern.matcher(password)
+
+        return matcher.matches()
     }
 
     fun reset() {
