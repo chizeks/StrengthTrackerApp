@@ -36,16 +36,20 @@ class WelcomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             currentFirebaseUser.value = authRepositoryImpl.getCurrentUser()
-            val response = usersRepositoryImpl.getUserByUid(currentFirebaseUser.value!!.uid)
+            if (currentFirebaseUser.value == null)
+                logout()
+            else {
+                val response = usersRepositoryImpl.getUserByUid(currentFirebaseUser.value!!.uid)
 
-            println("Here $response")
-           welcomeScreenState.value = when (response) {
-                is Resource.Success -> {
-                    currentUser.value = response.data
-                    WelcomeScreenState.CONNECTED
-                }
-                is Resource.Error -> {
-                    WelcomeScreenState.ERROR
+                println("Here $response")
+                welcomeScreenState.value = when (response) {
+                    is Resource.Success -> {
+                        currentUser.value = response.data
+                        WelcomeScreenState.CONNECTED
+                    }
+                    is Resource.Error -> {
+                        WelcomeScreenState.ERROR
+                    }
                 }
             }
         }
@@ -64,12 +68,13 @@ class WelcomeViewModel @Inject constructor(
     }
 
     // Invoked on an already logged-in user to log-out; may remove later
-    fun logout() {
+    fun logout(asError: Boolean = false) {
         welcomeScreenState.value = WelcomeScreenState.LOADING
         viewModelScope.launch {
             authRepositoryImpl.logout()
             currentUser.value = null
-            welcomeScreenState.value = WelcomeScreenState.DISCONNECTED
+            welcomeScreenState.value =
+                if (asError) WelcomeScreenState.ERROR else WelcomeScreenState.DISCONNECTED
         }
     }
 }

@@ -39,29 +39,33 @@ fun WelcomeScreen(
             }
         }
         CONNECTED -> {
-            Column {
-                Text(currentUser!!.email)
-                Text(currentUser!!.uid)
-                Text(currentUser!!.username)
-                Button(
-                    onClick = { viewModel.logout() }
-                ) {
-                    Text("Logout")
-                }
-                Button(
-                    onClick = { viewModel.getCurrentUserFromCollections() }
-                ) {
-                    Text("Read")
-                }
-                Button(
-                    onClick = { viewModel.updateCurrentUserUsername("NewUsername") }
-                ) {
-                    Text("Update")
-                }
-                Button(
-                    onClick = { viewModel.deleteCurrentUserFromCollections() }
-                ) {
-                    Text("Delete")
+            if (currentUser == null) {
+                viewModel.logout(true)
+            } else {
+                Column {
+                    Text(currentUser!!.email)
+                    Text(currentUser!!.uid)
+                    Text(currentUser!!.username)
+                    Button(
+                        onClick = { viewModel.logout() }
+                    ) {
+                        Text("Logout")
+                    }
+                    Button(
+                        onClick = { viewModel.getCurrentUserFromCollections() }
+                    ) {
+                        Text("Read")
+                    }
+                    Button(
+                        onClick = { viewModel.updateCurrentUserUsername("NewUsername") }
+                    ) {
+                        Text("Update")
+                    }
+                    Button(
+                        onClick = { viewModel.deleteCurrentUserFromCollections() }
+                    ) {
+                        Text("Delete")
+                    }
                 }
             }
         }
