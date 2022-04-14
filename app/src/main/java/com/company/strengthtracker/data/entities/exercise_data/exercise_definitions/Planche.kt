@@ -4,7 +4,7 @@ import com.company.strengthtracker.data.entities.exercise_data.main_categories.S
 
 class Planche (
 ): Statics() {
-    override val name:String = "Planche"
+    override var name:String = "Planche"
     override var aid: String = ""
     override var holdTime: String = ""
     override var weight: String = ""
