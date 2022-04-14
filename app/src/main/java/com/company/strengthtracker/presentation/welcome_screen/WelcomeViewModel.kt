@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.company.strengthtracker.data.entities.User
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
+import com.company.strengthtracker.data.repository.UsersRepositoryImpl
 import com.company.strengthtracker.domain.util.Resource
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(
-    private val authRepositoryImpl: AuthRepositoryImpl
+    private val authRepositoryImpl: AuthRepositoryImpl,
+    private val usersRepositoryImpl: UsersRepositoryImpl
 ) : ViewModel() {
 
     // Possible states that this screen should take
@@ -30,14 +32,11 @@ class WelcomeViewModel @Inject constructor(
     var currentUser: MutableState<User?> = mutableStateOf(null)
 
     fun getCurrentUserFromCollections() {
-
         welcomeScreenState.value = WelcomeScreenState.LOADING
 
         viewModelScope.launch {
-
             currentFirebaseUser.value = authRepositoryImpl.getCurrentUser()
-            val response = authRepositoryImpl
-                .getUserDataFromFirestore(currentFirebaseUser.value!!.uid)
+            val response = usersRepositoryImpl.getUserByUid(currentFirebaseUser.value!!.uid)
 
             println("Here $response")
            welcomeScreenState.value = when (response) {
@@ -49,8 +48,18 @@ class WelcomeViewModel @Inject constructor(
                     WelcomeScreenState.ERROR
                 }
             }
+        }
+    }
 
+    fun updateCurrentUserUsername(username: String) {
+        viewModelScope.launch {
+            usersRepositoryImpl.updateUserUsernameByUid(currentUser.value?.uid ?: "null", username)
+        }
+    }
 
+    fun deleteCurrentUserFromCollections() {
+        viewModelScope.launch {
+            usersRepositoryImpl.deleteUserByUid(currentUser.value?.uid ?: "null")
         }
     }
 

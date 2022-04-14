@@ -32,7 +32,11 @@ fun WelcomeScreen(
         }
         // User is already logged-in initially OR logged-in successfully
         ERROR -> {
-            Text("Error occurred")
+            Button(
+                onClick = { viewModel.logout() }
+            ) {
+                Text("Error occurred, log out")
+            }
         }
         CONNECTED -> {
             Column {
@@ -43,6 +47,21 @@ fun WelcomeScreen(
                     onClick = { viewModel.logout() }
                 ) {
                     Text("Logout")
+                }
+                Button(
+                    onClick = { viewModel.getCurrentUserFromCollections() }
+                ) {
+                    Text("Read")
+                }
+                Button(
+                    onClick = { viewModel.updateCurrentUserUsername("NewUsername") }
+                ) {
+                    Text("Update")
+                }
+                Button(
+                    onClick = { viewModel.deleteCurrentUserFromCollections() }
+                ) {
+                    Text("Delete")
                 }
             }
         }
@@ -58,7 +77,7 @@ fun WelcomeScreen(
         }
         // This currently shouldn't ever happen - probably remove in future
         LAUNCH -> {
-                viewModel.getCurrentUserFromCollections()
+            viewModel.getCurrentUserFromCollections()
         }
 
     }
