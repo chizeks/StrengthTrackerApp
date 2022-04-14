@@ -153,13 +153,14 @@ fun DayScreen(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-                bruhList.forEachIndexed { index, item ->
-                    DropdownMenuItem(onClick = {list.add(bruhList.get(index))
+            bruhList.forEachIndexed { index, item ->
+                DropdownMenuItem(onClick = {
+                    list.add(bruhList.get(index))
 
-                    }) {
-                        Text(text = bruhList.get(index).name)
-                    }
+                }) {
+                    Text(text = bruhList.get(index).name)
                 }
+            }
         }
 
         LazyColumn() {
@@ -170,195 +171,236 @@ fun DayScreen(
     }
 }
 
-    @OptIn(ExperimentalMaterialApi::class)
-    @Composable
-    fun DropDownCustomSet(
-        list: MutableList<AllExercises>
-    ) {
-        LazyColumn() {
-            items(items = list) { movement ->
-                DropDownCustomItem(movement = movement)
-            }
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun DropDownCustomSet(
+    list: MutableList<AllExercises>
+) {
+    LazyColumn() {
+        items(items = list) { movement ->
+            DropDownCustomItem(movement = movement)
         }
     }
+}
 
-    @OptIn(ExperimentalMaterialApi::class)
-    @Composable
-    fun DropDownCustomItem(
-        movement: AllExercises,
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun DropDownCustomItem(
+    movement: AllExercises,
 
-        ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(0.95f),
-            onClick = {}
-        ) {
-            Text(text = movement.name)
-        }
-    }
-
-    @ExperimentalMaterialApi
-    @Composable
-//Static as in static movement not in programming sense
-    fun ExpandableExerciseCard(
-        movement: AllExercises,
-        titleFontSize: TextUnit = MaterialTheme.typography.h6.fontSize,
-        titleFontWeight: FontWeight = FontWeight.Bold,
-        width: Float = 1.0f,
-        padding: Dp = 10.dp
     ) {
-        val title = movement.name
-        var expandedState by remember { mutableStateOf(false) }
-        var testString by remember { mutableStateOf("") }
+    Card(
+        modifier = Modifier.fillMaxWidth(0.95f),
+        onClick = {}
+    ) {
+        Text(text = movement.name)
+    }
+}
 
-        val rotationState by animateFloatAsState(
-            targetValue =
-            if (expandedState) 180f
-            else 0f
-        )
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(width)
-                .animateContentSize(
-                    animationSpec = tween(
-                        durationMillis = 300
-                    )
+@ExperimentalMaterialApi
+@Composable
+fun ExpandableExerciseCard(
+    movement: AllExercises,
+    titleFontSize: TextUnit = MaterialTheme.typography.h6.fontSize,
+    titleFontWeight: FontWeight = FontWeight.Bold,
+    width: Float = 1.0f,
+    padding: Dp = 10.dp
+) {
+    val title = movement.name
+    var expandedState by remember { mutableStateOf(false) }
+    var testString by remember { mutableStateOf("") }
+
+    val rotationState by animateFloatAsState(
+        targetValue =
+        if (expandedState) 180f
+        else 0f
+    )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(width)
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 300
                 )
-                .padding(padding)
-                .shadow(10.dp),
-            shape = Shapes.medium,
-            onClick = {
-                expandedState = !expandedState
-            }
+            )
+            .padding(padding)
+            .shadow(10.dp),
+        shape = Shapes.medium,
+        onClick = {
+            expandedState = !expandedState
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                Text(
+                    modifier = Modifier
+                        .weight(6f)
+                        .fillMaxWidth(),
+                    text = title,
+                    fontSize = titleFontSize,
+                    fontWeight = titleFontWeight,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+
+                )
+                IconButton(
+                    modifier = Modifier
+                        .alpha(ContentAlpha.medium)
+                        .weight(1f)
+                        .rotate(rotationState),
+                    onClick = {
+                        expandedState = !expandedState
+                    }
                 ) {
-                    Text(
-                        modifier = Modifier
-                            .weight(6f)
-                            .fillMaxWidth(),
-                        text = title,
-                        fontSize = titleFontSize,
-                        fontWeight = titleFontWeight,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Drop-down arrow"
                     )
-                    IconButton(
-                        modifier = Modifier
-                            .alpha(ContentAlpha.medium)
-                            .weight(1f)
-                            .rotate(rotationState),
-                        onClick = {
-                            expandedState = !expandedState
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Drop-down arrow"
-                        )
-                    }
                 }
+            }
 
 
-                var reps by remember { mutableStateOf("") }
-                var dWeight by remember { mutableStateOf("") }
-                var rir by remember { mutableStateOf("") }
-                var notes by remember { mutableStateOf(movement.notes) }
+            var reps by remember { mutableStateOf("") }
+            var dWeight by remember { mutableStateOf("") }
+            var rir by remember { mutableStateOf("") }
+            var notes by remember { mutableStateOf(movement.notes) }
 
-                if (expandedState) {
+            if (expandedState) {
 
-                    if (movement is Statics) {
-                        var notes by remember { mutableStateOf(movement.notes) }
-                        var sHoldTime by remember { mutableStateOf(movement.holdTime) }
-                        var sWeight by remember { mutableStateOf(movement.weight) }
-                        var sir by remember { mutableStateOf(movement.sir) }
-                        var progression by remember { mutableStateOf(movement.progression) }
+                if (movement is Statics) {
+                    var notes by remember { mutableStateOf(movement.notes) }
+                    var sHoldTime by remember { mutableStateOf(movement.holdTime) }
+                    var sWeight by remember { mutableStateOf(movement.weight) }
+                    var sir by remember { mutableStateOf(movement.sir) }
+                    var progression by remember { mutableStateOf(movement.progression) }
 
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = sHoldTime,
-                            onValueChange = {
-                                sHoldTime = it
-                            },
-                            label = { Text("Hold Time / Set") }
-                        )
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = sWeight,
-                            onValueChange = {
-                                sWeight = it
-                            },
-                            label = { Text("Weight / Set") }
-                        )
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = sir,
-                            onValueChange = {
-                                sir = it
-                            },
-                            label = { Text("SIR / Set") }
-                        )
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = progression,
-                            onValueChange = {
-                                progression = it
-                            },
-                            label = { Text("Progression / Set") }
-                        )
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = notes,
-                            onValueChange = {
-                                notes = it
-                            },
-                            label = { Text("Notes") }
-                        )
-                    } else if (movement is Dynamics) {
-
-                        var reps by remember { mutableStateOf(movement.reps) }
-                        var dWeight by remember { mutableStateOf(movement.weight) }
-                        var rir by remember { mutableStateOf(movement.rir) }
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = reps,
-                            onValueChange = {
-                                reps = it
-                            },
-                            label = { Text("reps / Set") }
-                        )
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = dWeight,
-                            onValueChange = {
-                                dWeight = it
-                            },
-                            label = { Text("Weight / Set") }
-                        )
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = rir,
-                            onValueChange = {
-                                rir = it
-                            },
-                            label = { Text("RIR / Set") }
-                        )
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = rir,
-                            onValueChange = {
-                                rir = it
-                            },
-                            label = { Text("Notes") }
-                        )
-                    }
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = sHoldTime,
+                        onValueChange = {
+                            sHoldTime = it
+                        },
+                        label = { Text("Hold Time / Set") }
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = sWeight,
+                        onValueChange = {
+                            sWeight = it
+                        },
+                        label = { Text("Weight / Set") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = sir,
+                        onValueChange = {
+                            sir = it
+                        },
+                        label = { Text("SIR / Set") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = progression,
+                        onValueChange = {
+                            progression = it
+                        },
+                        label = { Text("Progression / Set") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = notes,
+                        onValueChange = {
+                            notes = it
+                        },
+                        label = { Text("Notes") }
+                    )
+                } else if (movement is Dynamics) {
+                    var reps by remember { mutableStateOf(movement.reps) }
+                    var dWeight by remember { mutableStateOf(movement.weight) }
+                    var rir by remember { mutableStateOf(movement.rir) }
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = reps,
+                        onValueChange = {
+                            reps = it
+                        },
+                        label = { Text("reps / Set") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = dWeight,
+                        onValueChange = {
+                            dWeight = it
+                        },
+                        label = { Text("Weight / Set") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = rir,
+                        onValueChange = {
+                            rir = it
+                        },
+                        label = { Text("RIR / Set") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = rir,
+                        onValueChange = {
+                            rir = it
+                        },
+                        label = { Text("Notes") },
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                        ),
+                        shape = MaterialTheme.shapes.medium
+                    )
                 }
             }
         }
     }
+}

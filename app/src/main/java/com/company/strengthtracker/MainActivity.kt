@@ -1,8 +1,10 @@
 package com.company.strengthtracker
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
@@ -21,6 +23,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @InternalCoroutinesApi
 @ExperimentalCoroutinesApi
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

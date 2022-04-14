@@ -6,13 +6,11 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -92,28 +90,39 @@ fun RegisterScreen(
                         verticalArrangement = Arrangement.SpaceEvenly
                     ) {
                         TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            value = newUserDob,
-                            onValueChange = { newUserDob = it },
-                            label = { Text("Date of birth") }
-                        )
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(0.dp, 3.dp, 0.dp, 3.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             value = newUserEmail,
                             onValueChange = { newUserEmail = it },
-                            label = { Text("Email") }
+                            label = { Text("Email") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                focusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                            ),
+                            shape = MaterialTheme.shapes.medium
                         )
                         TextField(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(0.dp, 3.dp, 0.dp, 3.dp),
                             value = newUserId,
                             onValueChange = { newUserId = it },
-                            label = { Text("Username") }
+                            label = { Text("Username") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                focusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                            ),
+                            shape = MaterialTheme.shapes.medium
                         )
 
                         TextField(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(0.dp, 3.dp, 0.dp, 3.dp),
                             visualTransformation = if (passwordVis) VisualTransformation.None else PasswordVisualTransformation(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             value = newUserPassText,
@@ -122,17 +131,31 @@ fun RegisterScreen(
                                 newUserPassText = it
                             },
                             trailingIcon = { },
-                            label = { Text("Password") }
+                            label = { Text("Password") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                focusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                            ),
+                            shape = MaterialTheme.shapes.medium
                         )
                         TextField(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(0.dp, 3.dp, 0.dp, 3.dp),
                             visualTransformation = if (passwordVis) VisualTransformation.None else PasswordVisualTransformation(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             value = passConfirmation,
                             onValueChange = {
                                 passConfirmation = it
                             },
-                            label = { Text("Confirm password") }
+                            label = { Text("Confirm password") },
+                            colors = TextFieldDefaults.textFieldColors(
+                                focusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                            ),
+                            shape = MaterialTheme.shapes.medium
                         )
                         Button(
                             modifier = Modifier.fillMaxWidth(),
