@@ -5,13 +5,11 @@ import com.company.strengthtracker.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -97,10 +95,19 @@ fun LoginScreen(
                                 .padding(16.dp)
                         ) {
                             TextField(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(0.dp,0.dp,0.dp,4.dp),
                                 value = userIdText,
+                                shape = MaterialTheme.shapes.medium,
                                 onValueChange = { userIdText = it },
-                                label = { Text("UserID") }
+                                label = { Text("UserID") },
+
+                                colors = TextFieldDefaults.textFieldColors(
+                                    focusedIndicatorColor = Color.Transparent,
+                                    disabledIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                ),
                             )
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
@@ -108,7 +115,13 @@ fun LoginScreen(
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                                 value = userPassText,
                                 onValueChange = { userPassText = it },
-                                label = { Text("Password") }
+                                label = { Text("Password") },
+                                shape = MaterialTheme.shapes.medium,
+                                colors = TextFieldDefaults.textFieldColors(
+                                    focusedIndicatorColor = Color.Transparent,
+                                    disabledIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                )
                             )
                             /* BUTTONS */
                             // Login
