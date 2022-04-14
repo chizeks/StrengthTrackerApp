@@ -22,6 +22,8 @@ import javax.inject.Singleton
 // Checking authentication
 // Actual implementation of AuthRepository interface
 
+
+
 class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth // Implementation of Authentication
 ) : AuthRepository {
@@ -31,23 +33,20 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun registerUser(
         email: String,
         password: String
-    ): Resource<String> {
-        return try {
-            val response = auth.createUserWithEmailAndPassword(
-                email,
-                password
-            ).await()
+    ) = try {
+        // Method provided by FirebaseAuth
+        val response = auth.createUserWithEmailAndPassword(
+            email,
+            password
+        ).await()
+        if (response.user != null)
+            Resource.Success(response.user!!.uid)
+        else Resource.Error("An error occurred in registration.")
 
-            if (response.user != null) {
-                // User has been added to Firebase Authentication, add to Firestore collection now
-                Resource.Success(response.user!!.uid)
-            }
-            else Resource.Error("some error")
-
-        } catch (e: Exception) {
-            Resource.Error("${e.message}")
-        }
+    } catch (e: Exception) {
+        Resource.Error("${e.message}")
     }
+
 
     override suspend fun login(email: String, password: String): Resource<FirebaseUser?> {
         return try {
@@ -67,7 +66,7 @@ class AuthRepositoryImpl @Inject constructor(
         return try {
             auth.signOut()
             return Resource.Success(true)
-        }  catch (e: Exception) {
+        } catch (e: Exception) {
             Resource.Error("${e.message}")
         }
     }

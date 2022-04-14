@@ -20,3 +20,4 @@ object AppModule {
     @Provides
     fun provideUsersCollection() = FirebaseFirestore.getInstance().collection("users")
 }
+

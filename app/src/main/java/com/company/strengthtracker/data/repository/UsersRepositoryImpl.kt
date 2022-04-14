@@ -15,8 +15,8 @@ class UsersRepositoryImpl @Inject constructor(
         return try {
             val response = usersCollection.document(uid).get().await()
             if (response != null) {
-                    val user = response.toObject(User::class.java)
-                    return Resource.Success(data = user)
+                val user = response.toObject(User::class.java)
+                return Resource.Success(data = user)
             } else Resource.Error("Error in login")
 
         } catch (e: Exception) {

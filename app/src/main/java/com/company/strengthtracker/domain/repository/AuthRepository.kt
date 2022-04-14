@@ -1,6 +1,5 @@
 package com.company.strengthtracker.domain.repository
 
-import com.company.strengthtracker.data.entities.User
 import com.company.strengthtracker.domain.util.Resource
 import com.google.firebase.auth.FirebaseUser
 
@@ -21,3 +20,4 @@ interface AuthRepository {
     suspend fun logout(): Resource<Boolean>
 
 }
+
