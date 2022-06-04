@@ -99,7 +99,7 @@ fun DayScreen(
     bruhList.add(FrontLever())
 
     var expandedPicker by remember { mutableStateOf(false) }
-    var exState by remember{mutableStateOf(false)}
+    var exState by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -116,56 +116,27 @@ fun DayScreen(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier.fillMaxWidth(0.2f)) {
-                Image(
-                    painter = painterResource(id = R.drawable.gigachad),
-                    contentDescription = "Giga Chad"
-                )
-            }
             IconButton(
                 modifier = Modifier
                     .alpha(ContentAlpha.medium)
                     .weight(1f),
                 onClick = {
-                   exState = !exState
+                    exState = !exState
                 }
             ) {
 
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = "switch to month view"
-                    )
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "switch to month view"
+                )
 
-            }
-
-            Button(
-                modifier = Modifier
-                    .weight(3f)
-                    .fillMaxWidth()
-                    .padding(2.dp),
-                onClick = {
-
-                })
-            {
-                Text(text = "Notes")
-            }
-            Button(
-                modifier = Modifier
-                    .weight(1.5f)
-                    .fillMaxWidth()
-                    .padding(2.dp),
-                onClick = {
-                    
-                })
-            {
-                Text(text = "+")
             }
 
         }
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceEvenly
-        ){
+        ) {
 
             ExpandableExerciseCard(movement = Planche())
 
@@ -195,58 +166,13 @@ fun DayScreen(
     }
 
 }
-//@Composable
-//fun customExpandCalendar(
-//    rotationState: Float = 1.0f,
-//)
-//{
-//    var exState by remember { mutableStateOf(true) }
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .animateContentSize(
-//                animationSpec = tween(
-//                    durationMillis = 1000
-//                )
-//            ),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Top
-//        ){
-//
-//        AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
-//            customCalendar(exState)
-//        }
-//        AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
-//            customCalendar(exState)
-//        }
-//
-//        Row() {
-//            IconButton(
-//                modifier = Modifier
-//                    .alpha(ContentAlpha.high)
-//                    .weight(1f)
-//                    .rotate(rotationState),
-//
-//                onClick = {
-//                    exState = !exState
-//
-//                }
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Outlined.Menu,
-//                    contentDescription = "Drop-down arrow"
-//                )
-//            }
-//        }
-//    }
-//
-//}
+
 
 @Composable
 fun customCalendar(
     state: Boolean
-){
-    if(state) {
+) {
+    if (state) {
         MaterialTheme(
             colors = Colors(
                 primary = Color.White,
@@ -290,8 +216,7 @@ fun customCalendar(
                 })
 
         }
-    }
-    else {
+    } else {
         MaterialTheme(
             colors = Colors(
                 primary = Color.White,
@@ -378,23 +303,20 @@ fun ExpandCalendar(
                 .padding(0.dp)
         ) {
 
-            var animationState by remember {mutableStateOf(true)}
-            var animationStateExpanded by remember {mutableStateOf(false)}
+            var animationState by remember { mutableStateOf(true) }
+            var animationStateExpanded by remember { mutableStateOf(false) }
 
-            if(expandedState){
+            if (expandedState) {
 
-                    AnimatedVisibility(visible = animationState, enter = fadeIn(), exit = fadeOut(),) {
-                    customCalendar(expandedState)
+                customCalendar(expandedState)
 
-                }
+
+            } else {
+
+
+                customCalendar(expandedState)
+
             }
-          else {
-
-                AnimatedVisibility(visible = animationState, enter = fadeIn() + expandVertically(), exit = fadeOut()) {
-                    customCalendar(expandedState)
-                        // animationState = true
-                }
-          }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -408,38 +330,14 @@ fun ExpandCalendar(
                         expandedState = !expandedState
                     }
                 ) {
-                    if(expandedState) {
+                    if (expandedState) {
                         Icon(
                             imageVector = Icons.Filled.CalendarViewMonth,
                             contentDescription = "switch to month view"
                         )
-                    }
-                    else{
+                    } else {
                         Icon(
                             imageVector = Icons.Filled.CalendarViewWeek,
-                            contentDescription = "switch to week view"
-                        )
-                    }
-                }
-                IconButton(
-                    modifier = Modifier
-                        .alpha(ContentAlpha.medium)
-                        .weight(1f)
-                        .rotate(rotationState),
-                    onClick = {
-                        animationState = !animationState
-                        animationStateExpanded = !animationStateExpanded
-                    }
-                ) {
-                    if(expandedState) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "switch to month view"
-                        )
-                    }
-                    else{
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
                             contentDescription = "switch to week view"
                         )
                     }
@@ -450,8 +348,6 @@ fun ExpandCalendar(
         }
     }
 }
-
-
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -508,7 +404,7 @@ fun ExpandableExerciseCard(
                 )
             )
             .padding(padding)
-            .shadow(10.dp),
+            .shadow(3.dp),
         shape = Shapes.medium,
         onClick = {
             expandedState = !expandedState
@@ -649,7 +545,7 @@ fun StaticsTextFields(movement: Statics) {
     var sWeight by remember { mutableStateOf(movement.weight) }
     var sir by remember { mutableStateOf(movement.sir) }
     var progression by remember { mutableStateOf(movement.progression) }
-    var list by remember {mutableStateOf(mutableListOf(1))}
+    var list by remember { mutableStateOf(mutableListOf(1)) }
 
     list.add(1)
     list.add(2)
