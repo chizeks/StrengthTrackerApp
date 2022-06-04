@@ -13,6 +13,8 @@ import javax.inject.Inject
 class DayViewModel @Inject constructor(
     private val authRepositoryImpl: AuthRepositoryImpl
 ) : ViewModel() {
+    fun dataRead() {
 
+    }
 
 }
