@@ -23,12 +23,15 @@ import androidx.navigation.NavController
 import com.company.strengthtracker.R
 import com.company.strengthtracker.Screen
 import com.company.strengthtracker.presentation.register_screen.RegisterViewModel.RegisterScreenState.*
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember{SnackbarHostState()}
 
     val screenState by remember { viewModel.registerScreenState }
     val context = LocalContext.current
@@ -162,16 +165,21 @@ fun RegisterScreen(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
                                 if (newUserPassText == passConfirmation) {
-                                    //viewModel.checkPass(newUserPassText)
-                                    viewModel.registerUser(
-                                        email = newUserEmail,
-                                        password = newUserPassText,
-                                        username = newUserId
-                                    )
+                                    if(viewModel.checkPass(newUserPassText))
+                                        viewModel.registerUser(
+                                            email = newUserEmail,
+                                            password = newUserPassText,
+                                            username = newUserId
+                                        )
+                                    else {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Not enough special characters")
+                                        }
+                                    }
                                 } else {
-                                    context.dynamicToast("Passwords do not match")
-                                    passConfirmation = ""
-                                    newUserPassText = ""
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Passwords do not match")
+                                    }
                                 }
                             }
 
@@ -181,8 +189,10 @@ fun RegisterScreen(
                     }
                 }
             }
+            SnackbarHost(hostState = snackbarHostState)
         }
     }
+
 }
 
 fun Context.dynamicToast(msg : String) {
@@ -190,5 +200,4 @@ fun Context.dynamicToast(msg : String) {
     toast.setGravity(Gravity.TOP, 0, 0)
     toast.show()
 }
-
 
