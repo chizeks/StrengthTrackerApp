@@ -73,7 +73,6 @@ fun DayScreen(
     viewModel: DayViewModel = hiltViewModel()
 
 ) {
-    
     val list = remember {
         mutableStateListOf<AllExercises>()
     }
