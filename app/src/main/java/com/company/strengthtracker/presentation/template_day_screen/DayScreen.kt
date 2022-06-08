@@ -57,20 +57,7 @@ fun DayScreen(
     viewModel: DayViewModel = hiltViewModel()
 
 ) {
-    var date: LocalDate by remember { mutableStateOf(LocalDate.now()) }
-    // var dateString by remember { mutableStateOf(date.toString()) }
-    val dialogState = rememberMaterialDialogState()
-    MaterialDialog(
-        dialogState = dialogState,
-        buttons = {
-            positiveButton("Select")
-            negativeButton("Close")
-        }
-    ) {
-        datepicker {
-            date = it
-        }
-    }
+
     val list = remember {
         mutableStateListOf<AllExercises>()
     }
