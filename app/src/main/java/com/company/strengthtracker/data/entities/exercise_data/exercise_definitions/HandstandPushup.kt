@@ -3,14 +3,14 @@ package com.company.strengthtracker.data.entities.exercise_data.exercise_definit
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Dynamics
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
 
-class HandstandPushup (override val name: String = "Handstand Pushup"
+class HandstandPushup (override var name: String = "Handstand Pushup"
 ): Dynamics() {
-    override var aid: String = ""
     override var reps: String = ""
     override var weight: String = ""
     override var rir: String = ""
     override var notes: String = ""
-
+    override var setNumber:Int = -1
+    var exType = "dynamic"
     constructor(
         aid: String,
         reps: String,
@@ -19,7 +19,6 @@ class HandstandPushup (override val name: String = "Handstand Pushup"
         notes: String,
 
     ) : this() {
-        this.aid = aid
         this.reps = reps
         this.weight = weight
         this.rir = rir

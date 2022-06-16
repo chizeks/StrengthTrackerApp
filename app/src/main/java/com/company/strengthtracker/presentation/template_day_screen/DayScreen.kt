@@ -6,8 +6,6 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -42,9 +40,6 @@ import com.himanshoe.kalendar.common.KalendarSelector
 import com.himanshoe.kalendar.common.KalendarStyle
 import com.himanshoe.kalendar.common.theme.KalendarShape
 
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import com.himanshoe.kalendar.ui.Kalendar
 import com.himanshoe.kalendar.ui.KalendarType
@@ -54,27 +49,42 @@ import com.himanshoe.kalendar.ui.KalendarType
 @Composable
 fun DayScreen(
     navController: NavController,
-    viewModel: DayViewModel = hiltViewModel()
-
+    viewModel: DayViewModel = hiltViewModel(),
 ) {
 
-    val list = remember {
-        mutableStateListOf<AllExercises>()
-    }
+    //State reference
+    val screenState by remember { viewModel.dayScreenState }
+    //holds date on select from calendar and on open app.
+    var date: LocalDate by remember { mutableStateOf(LocalDate.now()) }
 
+    //holder for passing data back to UI from viewmodel
+    var exerciseBundle = remember { viewModel.exerciseBundleMain }
 
-    var expandedPicker by remember { mutableStateOf(false) }
+    //Controls Calendar state
     var exState by remember { mutableStateOf(false) }
 
+    //holder for main screen
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 300
+                )
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
-    ) {
+    ) { //fades in/out child elements
         AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
-            ExpandCalendar(updateDay = { date = it })
+
+            ExpandCalendar(updateDay = {
+                date = it //date lambda
+                viewModel.updateDate(it) //updating vm
+            })
         }
 
+
+        //Holder for top bar buttons and stuff
         Row(
             modifier = Modifier
                 .padding(10.dp),
@@ -84,6 +94,7 @@ fun DayScreen(
             Row(
                 modifier = Modifier.weight(2f)
             ) {
+                //opens calendar
                 IconButton(
                     modifier = Modifier
                         .alpha(ContentAlpha.medium),
@@ -91,65 +102,84 @@ fun DayScreen(
                         exState = !exState
                     }
                 ) {
-
                     Icon(
                         imageVector = Icons.Sharp.CalendarViewWeek,
                         contentDescription = "switch to month view"
                     )
-
-                }
-                IconButton(
-                    modifier = Modifier
-                        .alpha(ContentAlpha.medium),
-                    onClick = {
-
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Sharp.Notes,
-                        contentDescription = "note-view"
-                    )
-
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(0.305f)
+            //does nothing currently
+            IconButton(
+                modifier = Modifier
+                    .alpha(ContentAlpha.medium),
+                onClick = {
+
+                }
             ) {
-                OutlinedTextField(
-                    value = date.toString(),
-                    onValueChange = {/*Check for day data and load */
-                    },
-                    enabled = false,
+                Icon(
+                    imageVector = Icons.Sharp.Notes,
+                    contentDescription = "note-view"
                 )
+
             }
         }
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceEvenly
+        Row(
+            modifier = Modifier.fillMaxWidth(0.305f)
         ) {
+            OutlinedTextField(
+                value = date.toString(),
+                onValueChange = {/*Check for day data and load */
+                },
+                enabled = false,
+            )
+        }
+        when (screenState) {
+            DayViewModel.DayScreenState.LAUNCH -> {
+                Button(onClick = {
+                    viewModel.getSetDataForDate()
+                }) {
 
-            ExpandableExerciseCard(movement = Planche(), date = date)
+                }
+            }
+            DayViewModel.DayScreenState.LOADING -> {
+                Text(text = "Loading")
+            }
+            DayViewModel.DayScreenState.LOADED -> {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    TextField(value = exerciseBundle.size.toString(), onValueChange = {})
+                    exerciseBundle.forEachIndexed { index, element ->
+                        ExpandableExerciseCard(
+                            movement = element.get(index),
+                            date = date,
+                            exercises = element
+                        )
+                    }
+
+
+                }
+            }
 
         }
     }
-
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun DropDownCustomItem(
-    content: String,
+fun SelectionColumn(
+    exerciseList:List
 
-    ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(0.95f),
-        onClick = {}
-    ) {
-        Text(text = content)
-    }
+){
+
 }
 
+
+
+//Will hold exercise title and relevant information as it is logged
 @ExperimentalMaterialApi
 @Composable
 fun ExpandableExerciseCard(
@@ -158,18 +188,19 @@ fun ExpandableExerciseCard(
     titleFontWeight: FontWeight = FontWeight.Bold,
     width: Float = 1.0f,
     padding: Dp = 10.dp,
-    date: LocalDate
+    date: LocalDate,
+    exercises: MutableList<AllExercises>
+
 ) {
+    var bruh: Long = 0
+    //for tracking how many sets have been logged, just increments in a lambda
+    var setsSoFar by remember { mutableStateOf(bruh) }
+
+    //card title
     val title = movement.name
+
+    //managed expanded state of the set log pop up
     var expandedState by remember { mutableStateOf(false) }
-
-    val rotationState by animateFloatAsState(
-        targetValue =
-        if (expandedState) 180f
-        else 0f
-    )
-
-
     Card(
         modifier = Modifier
             .fillMaxWidth(width)
@@ -192,31 +223,96 @@ fun ExpandableExerciseCard(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.Start
             ) {
+                //test widget
                 Text(
-                    modifier = Modifier
-                        .weight(6f)
-                        .fillMaxWidth(),
                     text = title,
                     fontSize = titleFontSize,
                     fontWeight = titleFontWeight,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.alpha(alpha = 0.8f)
                 )
-                Row() {
-                    Column() {
+                Text(
+                    text = setsSoFar.toString()
+                )
+
+            }
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth(0.99f)
+                        .padding(start = 0.dp, top = 10.dp, bottom = 5.dp, end = 0.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.99f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    Text(
+                        "Set No.",
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(0.98f),
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        "Lever",
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(1.0f),
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        "Hold Time",
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(1.4f),
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        "Assist",
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(1.1f),
+                        textAlign = TextAlign.Start
+                    )
+
+                    Text(
+                        "SiR",
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(0.9f),
+                        textAlign = TextAlign.Start
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Column{
+                    exercises.forEach { exercise ->
+                        CondensedSetRow(movement = exercise)
 
                     }
                 }
             }
 
+            //popup controller, will have different popups maybe? not sure
             if (expandedState) {
 
                 if (movement is Statics) {
 
-                    StaticsAddSetPopUp(movement = movement, date = date)
+                    StaticsAddSetPopUp(
+                        movement = movement,
+                        date = date,
+                        setsSoFar = setsSoFar
+                    ) { setsSoFar = it }
                     //StaticsTextFields(movement = movement)
                 } else if (movement is Dynamics) {
                     //  DynamicsTextFields(movement = movement)
@@ -227,10 +323,64 @@ fun ExpandableExerciseCard(
 }
 
 @Composable
+fun CondensedSetRow(
+    movement: AllExercises
+) {
+
+    Row(
+        modifier = Modifier.fillMaxWidth(0.99f),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    )
+    {
+        if (movement is Statics) {
+            Text(
+                movement.setNumber.toString(),
+                fontSize = 14.sp,
+                modifier = Modifier.weight(0.98f),
+                textAlign = TextAlign.Start
+            )
+
+            Text(
+                movement.progression,
+                fontSize = 14.sp,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Start
+            )
+
+            Text(
+                movement.holdTime,
+                fontSize = 14.sp,
+                modifier = Modifier.weight(1.4f),
+                textAlign = TextAlign.Start
+            )
+
+            Text(
+                movement.weight,
+                fontSize = 14.sp,
+                modifier = Modifier.weight(1.1f),
+                textAlign = TextAlign.Start
+            )
+
+            Text(
+                movement.sir,
+                fontSize = 14.sp,
+                modifier = Modifier.weight(0.9f),
+                textAlign = TextAlign.Start
+            )
+        } else if (movement is Dynamics) {
+            //TODO
+        }
+    }
+}
+
+@Composable
 fun StaticsAddSetPopUp(
     movement: Statics,
     date: LocalDate,
-    viewModel: DayViewModel = hiltViewModel()
+    viewModel: DayViewModel = hiltViewModel(),
+    setsSoFar: Long,
+    updateSetNumber: (Long) -> Unit
 ) {
     var openDialog by remember { mutableStateOf(true) }
     var textContentProgression by remember { mutableStateOf("") }
@@ -255,25 +405,35 @@ fun StaticsAddSetPopUp(
                     DropDownTextField(
                         label = "Progression",
                         movement = movement
-                    ) { textContentProgression = it }
+                    ) {
+                        textContentProgression = it
+                        movement.progression = it
+                    }
                     TimeIncrementTextField(
                         label = "Time",
                         movement = movement,
                         trailingLabel = "sec",
                         onDataChanged = {
                             textContentTime = it
+                            movement.holdTime = it
                         }
                     )
                     WeightIncrementTextField(
                         movement = movement,
                         label = "Assistance",
                         trailingLabel = "kg."
-                    ) { textContentAssistance = it }
+                    ) {
+                        textContentAssistance = it
+                        movement.weight = it
+                    }
                     TimeIncrementTextField(
                         movement = movement,
                         label = "SiR",
                         trailingLabel = "sec"
-                    ) { textContentSiR = it }
+                    ) {
+                        textContentSiR = it
+                        movement.sir = it
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
@@ -282,15 +442,13 @@ fun StaticsAddSetPopUp(
 
                         //add set
                         Button(
+
                             onClick = {
+                                updateSetNumber(setsSoFar + 1)
+                                movement.setNumber = setsSoFar
                                 /*PASS DATA TO VIEWMODEL, IMMEDIATELY MAKE NEW DOCUMENT*/
                                 viewModel.addStaticsSet(
-                                    name = movement.name,
-                                    progression = textContentProgression,
-                                    time = textContentTime,
-                                    assistance = textContentAssistance,
-                                    SiR = textContentSiR,
-                                    date = date
+                                    movement
                                 )
                                 openDialog = false
 
@@ -320,6 +478,7 @@ fun StaticsAddSetPopUp(
 
 }
 
+//custom TextField and +/- widgets
 @Composable
 fun WeightIncrementTextField(
     movement: Statics,
@@ -410,7 +569,7 @@ fun WeightIncrementTextField(
                     Icon(
                         imageVector = Icons.Filled.Minimize,
                         contentDescription = "decrement-seconds",
-                       // modifier = Modifier.scale(scaleX = 1.05f, scaleY = 1.05f),
+                        // modifier = Modifier.scale(scaleX = 1.05f, scaleY = 1.05f),
 
                     )
                 }
@@ -420,6 +579,8 @@ fun WeightIncrementTextField(
     }
 }
 
+
+//same as weight, gotta combine these later
 @Composable
 fun TimeIncrementTextField(
     movement: Statics,
@@ -511,6 +672,8 @@ fun TimeIncrementTextField(
     }
 }
 
+
+//Textfield with a dropdown menu, currently doesnt take a list as input but could add
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DropDownTextField(
@@ -761,6 +924,20 @@ fun ExpandCalendar(
     }
 }
 
+//@OptIn(ExperimentalMaterialApi::class)
+//@Composable
+//fun DropDownCustomItem(
+//    content: String,
+//
+//    ) {
+//    Card(
+//        modifier = Modifier.fillMaxWidth(0.95f),
+//        onClick = {}
+//    ) {
+//        Text(text = content)
+//    }
+//}
+
 @Composable
 fun ComposeDemo(
 ) {
@@ -769,9 +946,9 @@ fun ComposeDemo(
     ) {
 
     }
-    Row (
+    Row(
 
-            ){
+    ) {
 
     }
     Card(

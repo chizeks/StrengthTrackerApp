@@ -2,29 +2,31 @@ package com.company.strengthtracker.data.entities.exercise_data.exercise_definit
 
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
 
-class FrontLever (
+class FrontLever(
 
-    override val name: String = "Front Lever"
-): Statics() {
-    override var aid: String = ""
-    override var holdTime: String = ""
-    override var weight: String = ""
-    override var sir: String = ""
-    override var progression:String = ""
-    override var notes:String = ""
-    constructor(
-        aid: String,
-        holdTime: String,
-        weight: String,
-        sir: String,
-        progression: String,
-        notes:String,
-    ):this(){
-        this.aid = aid
-        this.holdTime = holdTime
-        this.weight = weight
-        this.sir = sir
-        this.progression = progression
-        this.notes = notes
-    }
+    name: String = "Front Lever",
+    holdTime: String = "",
+    weight: String = "",
+    sir: String = "",
+    progression: String = "",
+    notes: String = "",
+    setNumber: Long = -1,
+    exType: String = "static"
+) : Statics(
+    name = name,
+    weight = weight,
+    holdTime = holdTime,
+    progression = progression,
+    notes = notes,
+    sir = sir,
+    setNumber = setNumber
+) {
+    override var name = name
+    override var holdTime = holdTime
+    override var weight = weight
+    override var sir = sir
+    override var progression = progression
+    override var notes = notes
+    override var setNumber = setNumber
+    override var exType = exType
 }
