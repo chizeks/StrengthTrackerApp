@@ -51,6 +51,7 @@ fun DayScreen(
     navController: NavController,
     viewModel: DayViewModel = hiltViewModel(),
 ) {
+
     //State reference
     val screenState by remember { viewModel.dayScreenState }
     //holds date on select from calendar and on open app.
