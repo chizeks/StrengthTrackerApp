@@ -32,7 +32,6 @@ import javax.inject.Inject
 @HiltViewModel
 class DayViewModel @Inject constructor(
     private val setRepositoryImpl: SetRepositoryImpl,
-
     ) : ViewModel() {
     // registerScreenState.value = RegisterScreenState.LOADING
 
@@ -92,8 +91,8 @@ class DayViewModel @Inject constructor(
                 .addOnSuccessListener { exercises ->
                     for (exercise in exercises) {
                         val docRef2 = db.collection("test")
-                            .document("2022-06-12")
-                            .collection("2022-06-12")
+                            .document(date.toString())
+                            .collection(date.toString())
                             .document(exercise.get("name").toString())
                             .collection(exercise.get("name").toString()).get()
                             .addOnSuccessListener { sets ->
