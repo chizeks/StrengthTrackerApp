@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -77,66 +78,70 @@ fun DayScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) { //fades in/out child elements
-        AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
 
-            ExpandCalendar(updateDay = {
-                date = it //date lambda
-                viewModel.updateDate(it) //updating vm
-            })
-        }
-
-
-        //Holder for top bar buttons and stuff
-        Row(
-            modifier = Modifier
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                modifier = Modifier.weight(2f)
-            ) {
-                //opens calendar
-                IconButton(
-                    modifier = Modifier
-                        .alpha(ContentAlpha.medium),
-                    onClick = {
-                        exState = !exState
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Sharp.CalendarViewWeek,
-                        contentDescription = "switch to month view"
-                    )
-                }
-            }
-            //does nothing currently
-            IconButton(
-                modifier = Modifier
-                    .alpha(ContentAlpha.medium),
-                onClick = {
-                    viewModel.openSelection()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "selectionview"
-                )
-
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(0.305f)
-        ) {
-            OutlinedTextField(
-                value = date.toString(),
-                onValueChange = {/*Check for day data and load */
-                },
-                enabled = false,
-            )
-        }
         when (screenState) {
             DayViewModel.DayScreenState.LAUNCH -> {
+
+                AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
+
+                    ExpandCalendar(updateDay = {
+                        date = it //date lambda
+                        viewModel.updateDate(it) //updating vm
+                    })
+                }
+
+
+                //Holder for top bar buttons and stuff
+                Row(
+                    modifier = Modifier
+                        .padding(10.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier.weight(2f)
+                    ) {
+                        //opens calendar
+                        IconButton(
+                            modifier = Modifier
+                                .alpha(ContentAlpha.medium),
+                            onClick = {
+                                exState = !exState
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Sharp.CalendarViewWeek,
+                                contentDescription = "switch to month view"
+                            )
+                        }
+                    }
+                    //does nothing currently
+                    IconButton(
+                        modifier = Modifier
+                            .alpha(ContentAlpha.medium),
+                        onClick = {
+                            viewModel.openSelection()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "selectionview"
+                        )
+
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.305f)
+                ) {
+                    OutlinedTextField(
+                        value = date.toString(),
+                        onValueChange = {/*Check for day data and load */
+                        },
+                        enabled = false,
+                    )
+                }
+
+
                 Button(onClick = {
                     viewModel.getSetDataForDate()
                 }) {
@@ -152,8 +157,6 @@ fun DayScreen(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
-                    TextField(value = exerciseBundle.size.toString(), onValueChange = {})
                     exerciseBundle.forEachIndexed { index, element ->
                         ExpandableExerciseCard(
                             movement = element.get(index),
@@ -180,9 +183,9 @@ fun SelectionColumn(
     exerciseList:List<AllExercises>,
     viewModel: DayViewModel
 ){
-    Column(modifier = Modifier.fillMaxSize(),
+    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly){
+        verticalArrangement = Arrangement.Top, ){
         exerciseList.forEach{ it
             SelectionCard(movement = it, viewModel = viewModel)
         }
@@ -198,9 +201,9 @@ fun SelectionCard(
 
     Card(modifier = Modifier.fillMaxWidth(0.95f),
     onClick = {
-        viewModel.exerciseBundleMain.add(mutableListOf(movement))
+
     }) {
-         Text(movement.name)
+         Text(movement.name, fontSize = 20.sp, modifier = Modifier.padding(50.dp))
     }
 }
 
