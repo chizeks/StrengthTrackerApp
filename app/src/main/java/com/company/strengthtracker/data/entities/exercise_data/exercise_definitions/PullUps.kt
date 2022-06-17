@@ -1,27 +1,15 @@
 package com.company.strengthtracker.data.entities.exercise_data.exercise_definitions
 
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Dynamics
+import com.company.strengthtracker.data.entities.exercise_data.main_categories.ExState
 
-class PullUps (override val name: String = "Pull ups"
-): Dynamics() {
-    override var aid: String = ""
-    override var reps: String = ""
-    override var weight: String = ""
-    override var rir: String = ""
-    override var notes: String = ""
+class PullUps(
+    name: String = "Pull-ups",
+    weight: String = "",
+    rir:String = "",
+    setNumber: Long = -1,
+    exType: ExState = ExState.DYNAMIC,
+    reps:String = ""
+): Dynamics(name = name, weight = weight, reps = reps, rir = rir, setNumber = setNumber) {
 
-    constructor(
-        aid: String,
-        reps: String,
-        weight: String,
-        rir: String,
-        notes: String,
-
-        ) : this() {
-        this.aid = aid
-        this.reps = reps
-        this.weight = weight
-        this.rir = rir
-        this.notes = notes
-    }
 }

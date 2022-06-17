@@ -12,4 +12,3 @@ val slateGrey = Color(0xFF708090)
 val brightGrey = Color(0xFFF2F2F2)
 val davysGrey = Color(0xFF555555)
 val spanishGrey = Color(0xFF999999)
-val bruh = "bruh"
