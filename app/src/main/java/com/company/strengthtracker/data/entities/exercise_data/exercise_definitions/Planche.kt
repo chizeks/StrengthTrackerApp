@@ -1,5 +1,6 @@
 package com.company.strengthtracker.data.entities.exercise_data.exercise_definitions
 
+import com.company.strengthtracker.data.entities.exercise_data.main_categories.ExState
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
 
 class Planche(
@@ -8,15 +9,13 @@ class Planche(
     weight: String = "",
     sir: String = "",
     progression: String = "",
-    notes: String = "",
     setNumber: Long = -1,
-    exType: String = "static"
+    exType: ExState = ExState.STATIC
 ) : Statics(
     name = name,
     weight = weight,
     holdTime = holdTime,
     progression = progression,
-    notes = notes,
     sir = sir,
     setNumber = setNumber,
 ) {
