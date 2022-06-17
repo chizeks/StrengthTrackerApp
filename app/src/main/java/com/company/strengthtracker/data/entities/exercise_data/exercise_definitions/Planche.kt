@@ -1,29 +1,24 @@
 package com.company.strengthtracker.data.entities.exercise_data.exercise_definitions
 
+import com.company.strengthtracker.data.entities.exercise_data.main_categories.ExState
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
 
-class Planche (
-): Statics() {
-    override var name:String = "Planche"
-    override var aid: String = ""
-    override var holdTime: String = ""
-    override var weight: String = ""
-    override var sir: String = ""
-    override var progression:String = ""
-    override var notes:String = ""
-    constructor(
-        aid: String,
-        holdTime: String,
-        weight: String,
-        sir: String,
-        progression: String,
-        notes:String,
-    ):this(){
-        this.aid = aid
-        this.holdTime = holdTime
-        this.weight = weight
-        this.sir = sir
-        this.progression = progression
-        this.notes = notes
-    }
+class Planche(
+    name: String = "Planche",
+    holdTime: String = "",
+    weight: String = "",
+    sir: String = "",
+    progression: String = "",
+    setNumber: Long = -1,
+    exType: ExState = ExState.STATIC
+) : Statics(
+    name = name,
+    weight = weight,
+    holdTime = holdTime,
+    progression = progression,
+    sir = sir,
+    setNumber = setNumber,
+) {
+    override var exType = exType
+
 }
