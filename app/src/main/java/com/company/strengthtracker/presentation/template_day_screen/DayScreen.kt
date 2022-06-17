@@ -147,6 +147,13 @@ fun DayScreen(
                 }) {
 
                 }
+                exerciseBundle.forEachIndexed { index, element ->
+                    ExpandableExerciseCard(
+                        movement = element.get(index),
+                        date = date,
+                        exercises = element
+                    )
+                }
             }
             DayViewModel.DayScreenState.LOADING -> {
                 Text(text = "Loading")
@@ -184,7 +191,9 @@ fun SelectionColumn(
     exerciseList:List<AllExercises>,
     viewModel: DayViewModel
 ){
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top, ){
         exerciseList.forEach{ it

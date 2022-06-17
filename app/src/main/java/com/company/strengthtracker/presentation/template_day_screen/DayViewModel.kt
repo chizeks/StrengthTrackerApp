@@ -54,7 +54,8 @@ class DayViewModel @Inject constructor(
     val dayScreenState = _dayScreenState
 
     //set list for selected date
-    private val _exerciseBundleMain = mutableStateListOf<MutableList<AllExercises>>()
+    private val _exerciseBundleMain = mutableStateListOf<MutableList<AllExercises>>(
+        mutableStateListOf(Planche()))
     //visible set list
     val exerciseBundleMain = _exerciseBundleMain
 
@@ -69,8 +70,8 @@ class DayViewModel @Inject constructor(
     }
 
     init {
-        //getSetDataForDate()
-        Log.d("INIT", "complete")
+        getSetDataForDate()
+        Log.d(TAG, " init complete ${_dayScreenState}")
     }
 
     fun openSelection(){
@@ -100,8 +101,9 @@ class DayViewModel @Inject constructor(
                                     mutableListOf()
                                 )
                                 for (set in sets) {
-                                    Log.d(TAG, "${set.data}")
+                                    Log.d(TAG, " ${set.data}")
                                     setBundle.add(
+
                                         Statics(
                                             name = set.get("name") as String,
                                             holdTime = set.get("holdTime") as String,
@@ -114,11 +116,11 @@ class DayViewModel @Inject constructor(
                                 }
                                 exerciseBundleMain.add(setBundle)
                             }
-
                     }
                 }.addOnFailureListener{
 
                 }
+
     }
 
     fun getSetDataForDate() {
@@ -129,7 +131,7 @@ class DayViewModel @Inject constructor(
                 dayScreenState.value = DayScreenState.LOADED
             }
             else if (exerciseBundleMain.size > 0) {
-                dayScreenState.value = DayScreenState.NODATA
+                dayScreenState.value = DayScreenState.SELECT
             }
         }
     }
