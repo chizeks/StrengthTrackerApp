@@ -59,7 +59,7 @@ fun DayScreen(
     //holds date on select from calendar and on open app.
     var date: LocalDate by remember { mutableStateOf(LocalDate.now()) }
 
-    //holder for passing data back to UI from viewmodel
+    //holder for passing data back to UI from viewModel
     var exerciseBundle = remember { viewModel.exerciseBundleMain }
 
     //Controls Calendar state
@@ -110,7 +110,7 @@ fun DayScreen(
                     )
                 }
             }
-            //does nothing currently
+            //does something currently
             IconButton(
                 modifier = Modifier
                     .alpha(ContentAlpha.medium),
@@ -153,7 +153,7 @@ fun DayScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    TextField(value = exerciseBundle.size.toString(), onValueChange = {})
+
                     exerciseBundle.forEachIndexed { index, element ->
                         ExpandableExerciseCard(
                             movement = element.get(index),

@@ -69,6 +69,11 @@ class DayViewModel @Inject constructor(
         Log.d(TAG, "Date is now: ${date}")
     }
 
+    init {
+        //getSetDataForDate()
+        Log.d("INIT", "complete")
+    }
+
     fun openSelection(){
         dayScreenState.value = DayScreenState.SELECT
     }
@@ -77,6 +82,9 @@ class DayViewModel @Inject constructor(
         _dayScreenState.value = DayScreenState.LAUNCH
     }
 
+    /*
+    TODO: rename and maybe move to repository if it's supposed to go there
+     */
     suspend fun ultimateBruhHelper() {
         val docRef =
             db.collection("test").document(
