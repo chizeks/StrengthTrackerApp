@@ -16,7 +16,7 @@ private val DarkColorPalette = darkColors(
 private val LightColorPalette = lightColors(
     primary = davysGrey,
     //primary = Color(0xFFF2F2F2),
-    primaryVariant = Color.Black,
+    primaryVariant = greyBlue,
     secondary = Teal200,
     onSurface = davysGrey,
     /* Other default colors to override
