@@ -12,9 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.company.strengthtracker.data.entities.exercise_data.ExerciseSet
 import com.company.strengthtracker.data.entities.exercise_data.exercise_definitions.Planche
-import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
-import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
-import com.company.strengthtracker.data.entities.exercise_data.main_categories.TypeDictionary
+import com.company.strengthtracker.data.entities.exercise_data.main_categories.*
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
 import com.company.strengthtracker.data.repository.SetRepositoryImpl
 import com.company.strengthtracker.domain.util.Resource
@@ -32,7 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DayViewModel @Inject constructor(
     private val setRepositoryImpl: SetRepositoryImpl,
-    ) : ViewModel() {
+) : ViewModel() {
     // registerScreenState.value = RegisterScreenState.LOADING
 
 
@@ -44,42 +42,48 @@ class DayViewModel @Inject constructor(
 
     //state enum for UI control
     enum class DayScreenState {
-        LAUNCH, LOADING, LOADED, NODATA, SELECT, SELECTED
+        LAUNCH, LOADING, LOADED, SELECT, SELECTED
     }
 
 
     //screenstate
     private val _dayScreenState = mutableStateOf(DayScreenState.LAUNCH)
+
     //visible screenstate
     val dayScreenState = _dayScreenState
 
     //set list for selected date
     private val _exerciseBundleMain = mutableStateListOf<MutableList<AllExercises>>()
+
     //visible set list
     val exerciseBundleMain = _exerciseBundleMain
+
+    private val _exList = mutableStateListOf<AllExercises>()
+    val exList = _exList
 
     //date-default: current date
     private var _dateIn = mutableStateOf(LocalDate.now())
     var dateIn = _dateIn
-    val date = dateIn.toString()
+    val date = dateIn.value.toString()
 
     fun updateDate(newValue: LocalDate) {
         dateIn.value = newValue
         Log.d(TAG, "Date is now: ${date}")
     }
 
-    fun openSelection(){
+    fun openSelection() {
         dayScreenState.value = DayScreenState.SELECT
     }
 
-    fun closeSelection(){
+    fun closeSelection() {
         _dayScreenState.value = DayScreenState.LAUNCH
     }
 
     suspend fun ultimateBruhHelper() {
         val docRef =
             db.collection("test").document(
-                    date.toString()).collection(date.toString()).get()
+                date.toString()
+            ).collection(date.toString()).get()
                 .addOnSuccessListener { exercises ->
                     for (exercise in exercises) {
                         val docRef2 = db.collection("test")
@@ -108,20 +112,17 @@ class DayViewModel @Inject constructor(
                             }
 
                     }
-                }.addOnFailureListener{
+                }.addOnFailureListener {
 
                 }
     }
 
     fun getSetDataForDate() {
         viewModelScope.launch { ->
-            dayScreenState.value = DayScreenState.LOADING
+           // dayScreenState.value = DayScreenState.LOADING
             ultimateBruhHelper()
-            if(exerciseBundleMain.size < 1){
-                dayScreenState.value = DayScreenState.LOADED
-            }
-            else if (exerciseBundleMain.size > 0) {
-                dayScreenState.value = DayScreenState.NODATA
+            if (exerciseBundleMain.size > 0) {
+                dayScreenState.value = DayScreenState.LAUNCH
             }
         }
     }
@@ -131,12 +132,13 @@ class DayViewModel @Inject constructor(
     ) {
 
         db.collection("test").document(date.toString()).collection(date.toString())
-            .document(movement.name).collection(movement.name).add(movement)
+            .document(movement.name, ).collection(movement.name).add(movement)
             .addOnSuccessListener { documentReference ->
                 Log.d(
                     TAG,
                     "DocumentSnapshot added with ID: ${documentReference.id} and curdate is ${date}"
                 )
+//                getSetDataForDate()
             }
     }
 
