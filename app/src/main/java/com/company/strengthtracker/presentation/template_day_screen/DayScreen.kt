@@ -35,6 +35,7 @@ import com.company.strengthtracker.data.entities.exercise_data.exercise_definiti
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Dynamics
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
+import com.company.strengthtracker.data.entities.exercise_data.main_categories.TypeDictionary
 import com.company.strengthtracker.ui.theme.*
 import com.himanshoe.kalendar.common.KalendarSelector
 import com.himanshoe.kalendar.common.KalendarStyle
@@ -51,6 +52,7 @@ fun DayScreen(
     navController: NavController,
     viewModel: DayViewModel = hiltViewModel(),
 ) {
+    val typeList = remember {viewModel.exerciseTypes}
 
     //State reference
     val screenState by remember { viewModel.dayScreenState }
@@ -113,12 +115,12 @@ fun DayScreen(
                 modifier = Modifier
                     .alpha(ContentAlpha.medium),
                 onClick = {
-
+                    viewModel.openSelection()
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Sharp.Notes,
-                    contentDescription = "note-view"
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "selectionview"
                 )
 
             }
@@ -163,18 +165,43 @@ fun DayScreen(
 
                 }
             }
+            DayViewModel.DayScreenState.SELECT -> {
+                SelectionColumn(exerciseList = typeList.value, viewModel = viewModel)
+            }
 
         }
     }
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SelectionColumn(
-    exerciseList:List
+    exerciseList:List<AllExercises>,
+    viewModel: DayViewModel
+){
+    Column(modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly){
+        exerciseList.forEach{ it
+            SelectionCard(movement = it, viewModel = viewModel)
+        }
+    }
+}
 
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SelectionCard(
+    movement:AllExercises,
+    viewModel: DayViewModel
 ){
 
+    Card(modifier = Modifier.fillMaxWidth(0.95f),
+    onClick = {
+        viewModel.exerciseBundleMain.add(mutableListOf(movement))
+    }) {
+         Text(movement.name)
+    }
 }
 
 
@@ -190,7 +217,6 @@ fun ExpandableExerciseCard(
     padding: Dp = 10.dp,
     date: LocalDate,
     exercises: MutableList<AllExercises>
-
 ) {
     var bruh: Long = 0
     //for tracking how many sets have been logged, just increments in a lambda

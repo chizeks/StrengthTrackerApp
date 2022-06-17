@@ -40,6 +40,9 @@ class DayViewModel @Inject constructor(
     //db reference for queries
     val db = Firebase.firestore
 
+    private val _exerciseTypes = mutableStateOf(TypeDictionary().typeDictionary)
+    val exerciseTypes = _exerciseTypes
+
     //state enum for UI control
     enum class DayScreenState {
         LAUNCH, LOADING, LOADED, NODATA, SELECT, SELECTED
@@ -66,11 +69,18 @@ class DayViewModel @Inject constructor(
         Log.d(TAG, "Date is now: ${date}")
     }
 
+    fun openSelection(){
+        dayScreenState.value = DayScreenState.SELECT
+    }
+
+    fun closeSelection(){
+        _dayScreenState.value = DayScreenState.LAUNCH
+    }
 
     suspend fun ultimateBruhHelper() {
         val docRef =
             db.collection("test").document(
-                    "2022-06-12").collection("2022-06-12").get()
+                    date.toString()).collection(date.toString()).get()
                 .addOnSuccessListener { exercises ->
                     for (exercise in exercises) {
                         val docRef2 = db.collection("test")
@@ -92,7 +102,6 @@ class DayViewModel @Inject constructor(
                                             sir = set.get("sir") as String,
                                             progression = set.get("progression") as String,
                                             setNumber = set.get("setNumber") as Long,
-                                            notes = set.get("notes") as String
                                         )
                                     )
                                 }

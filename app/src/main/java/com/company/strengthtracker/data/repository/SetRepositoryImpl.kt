@@ -44,7 +44,6 @@ class SetRepositoryImpl @Inject constructor(
                             sir = set.get("sir") as String,
                             progression = set.get("progression") as String,
                             setNumber = set.get("setNumber") as Long,
-                            notes = set.get("notes") as String
                         )
                     )
                     Log.d(ContentValues.TAG, "FUCK ---> 0")
