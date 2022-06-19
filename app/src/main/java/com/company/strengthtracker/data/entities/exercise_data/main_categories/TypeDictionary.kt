@@ -4,5 +4,5 @@ import com.company.strengthtracker.data.entities.exercise_data.exercise_definiti
 import java.util.*
 
 class TypeDictionary {
-    val typeDictionary = listOf<AllExercises>(Planche(), FrontLever(), HandstandPushup(), PullUps(), Squat())
+    val typeDictionary = mutableListOf<AllExercises>(Planche(), FrontLever(), HandstandPushup(), PullUps(), Squat())
 }
