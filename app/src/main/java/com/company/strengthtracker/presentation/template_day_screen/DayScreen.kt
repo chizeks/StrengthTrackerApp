@@ -60,8 +60,8 @@ fun DayScreen(
     //State reference
     val screenState by remember { viewModel.dayScreenState }
     //holds date on select from calendar and on open app.
-    var date: LocalDate by remember { mutableStateOf(LocalDate.now()) }
-
+    var dateString = remember { viewModel.date.value.toString() }
+    var date = remember {viewModel.dateIn}
     //holder for passing data back to UI from viewmodel
     var exerciseBundle = remember { viewModel.exerciseBundleMain }
 
@@ -83,73 +83,28 @@ fun DayScreen(
 
         when (screenState) {
             DayViewModel.DayScreenState.LAUNCH -> {
+                TopAppBar(viewModel = viewModel, dateString = dateString)
 
-                AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
+//                Column(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    verticalArrangement = Arrangement.SpaceEvenly,
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    exerciseBundle.forEachIndexed { index, element ->
+//                            ExpandableExerciseCard(
+//                                movement = element.get(0),
+//                                date = date,
+//                                exercises = exerciseBundle.get(index)
+//                            )
+//                    }
+//                }
+            }
+            DayViewModel.DayScreenState.LOADING -> {
+                Text(text = "Loading")
+            }
+            DayViewModel.DayScreenState.LOADED -> {
 
-                    ExpandCalendar(updateDay = {
-                        date = it //date lambda
-                        viewModel.updateDate(it) //updating vm
-                    })
-                }
-
-
-                //Holder for top bar buttons and stuff
-                Row(
-                    modifier = Modifier
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        modifier = Modifier.weight(2f)
-                    ) {
-                        //opens calendar
-                        IconButton(
-                            modifier = Modifier
-                                .alpha(ContentAlpha.medium),
-                            onClick = {
-                                exState = !exState
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Sharp.CalendarViewWeek,
-                                contentDescription = "switch to month view"
-                            )
-                        }
-                    }
-                    //does nothing currently
-                    IconButton(
-                        modifier = Modifier
-                            .alpha(ContentAlpha.medium),
-                        onClick = {
-                            viewModel.openSelection()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "selectionview"
-                        )
-
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(0.305f)
-                ) {
-                    OutlinedTextField(
-                        value = date.toString(),
-                        onValueChange = {/*Check for day data and load */
-                        },
-                        enabled = false,
-                    )
-                }
-
-
-                Button(onClick = {
-                    viewModel.getSetDataForDate()
-                }) {
-
-                }
-
+                TopAppBar( viewModel = viewModel, dateString = dateString)
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -157,40 +112,92 @@ fun DayScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     exerciseBundle.forEachIndexed { index, element ->
-                            ExpandableExerciseCard(
-                                movement = element.get(0),
-                                date = date,
-                                exercises = exerciseBundle.get(index)
-                            )
+                        ExpandableExerciseCard(
+                            movement = element.get(0),
+                            date = date.value,
+                            exercises = exerciseBundle.get(index)
+                        )
                     }
+
+
                 }
             }
-            DayViewModel.DayScreenState.LOADING -> {
-                Text(text = "Loading")
-            }
-            DayViewModel.DayScreenState.LOADED -> {
-//                Column(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    verticalArrangement = Arrangement.SpaceEvenly,
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    exerciseBundle.forEachIndexed { index, element ->
-//                        ExpandableExerciseCard(
-//                            movement = element.get(0),
-//                            date = date,
-//                            exercises = exerciseBundle.get(index)
-//                        )
-//                    }
-//
-//
-//                }
-            }
             DayViewModel.DayScreenState.SELECT -> {
+                viewModel.filterTypeList()
                 SelectionColumn(exerciseList = typeList.value, viewModel = viewModel)
             }
 
         }
     }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun TopAppBar(
+    viewModel:DayViewModel,
+    dateString:String
+){
+    var exState by remember { mutableStateOf(false) }
+
+    AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
+
+        ExpandCalendar(updateDay = {
+            //date lambda
+            viewModel.updateDate(it) //updating vm
+        })
+    }
+
+
+    //Holder for top bar buttons and stuff
+    Row(
+        modifier = Modifier
+            .padding(10.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        //opens calendar
+        IconButton(
+            modifier = Modifier
+                .alpha(ContentAlpha.medium)
+                .weight(1f),
+            onClick = {
+                exState = !exState
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Sharp.CalendarViewWeek,
+                contentDescription = "switch to month view"
+            )
+        }
+//        OutlinedTextField(
+//            value = dateString,
+//            modifier = Modifier.width(200.dp),
+//            onValueChange = {
+//
+//            },
+//
+//
+//            textStyle = TextStyle(textAlign = TextAlign.Center,
+//                fontSize = 20.sp),
+//        )
+        Text(dateString)
+        //does nothing currently
+        IconButton(
+            modifier = Modifier
+                .alpha(ContentAlpha.medium)
+                .weight(1f),
+            onClick = {
+                viewModel.openSelection()
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "selectionview"
+            )
+
+        }
+    }
+
 }
 
 
@@ -216,18 +223,19 @@ fun SelectionColumn(
 fun SelectionCard(
     movement:AllExercises,
     viewModel: DayViewModel
-){
-
-    Card(modifier = Modifier.fillMaxWidth(0.95f),
-    onClick = {
-        viewModel.exerciseBundleMain.add(mutableStateListOf(movement))
-        viewModel.closeSelection()
-    }) {
-         Text(movement.name, fontSize = 20.sp, modifier = Modifier.padding(50.dp))
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable(true, onClick = {
+                viewModel.exerciseBundleMain.add(mutableStateListOf(movement))
+                viewModel.closeSelection()
+            })
+        ) {
+            Text(movement.name, fontSize = 25.sp, modifier = Modifier.padding(50.dp))
+        }
     }
 }
-
-
 
 //Will hold exercise title and relevant information as it is logged
 @ExperimentalMaterialApi
@@ -966,42 +974,4 @@ fun ExpandCalendar(
 
         }
     }
-}
-
-//@OptIn(ExperimentalMaterialApi::class)
-//@Composable
-//fun DropDownCustomItem(
-//    content: String,
-//
-//    ) {
-//    Card(
-//        modifier = Modifier.fillMaxWidth(0.95f),
-//        onClick = {}
-//    ) {
-//        Text(text = content)
-//    }
-//}
-
-@Composable
-fun ComposeDemo(
-) {
-    Column(
-
-    ) {
-
-    }
-    Row(
-
-    ) {
-
-    }
-    Card(
-
-    ) {
-
-    }
-    Box() {
-
-    }
-
 }
