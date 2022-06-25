@@ -1,10 +1,13 @@
 package com.company.strengthtracker.presentation.template_day_screen
 
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -12,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.sharp.CalendarViewWeek
 import androidx.compose.material.icons.sharp.Notes
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +24,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,6 +36,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.company.strengthtracker.R
 import com.company.strengthtracker.data.entities.exercise_data.exercise_definitions.*
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Dynamics
@@ -40,30 +46,38 @@ import com.company.strengthtracker.ui.theme.*
 import com.himanshoe.kalendar.common.KalendarSelector
 import com.himanshoe.kalendar.common.KalendarStyle
 import com.himanshoe.kalendar.common.theme.KalendarShape
-
 import java.time.LocalDate
 import com.himanshoe.kalendar.ui.Kalendar
 import com.himanshoe.kalendar.ui.KalendarType
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @RequiresApi(Build.VERSION_CODES.O)
-@ExperimentalMaterialApi
 @Composable
 fun DayScreen(
     navController: NavController,
     viewModel: DayViewModel = hiltViewModel(),
 ) {
-    val typeList = remember {viewModel.exerciseTypes}
+    val typeList = remember { viewModel.exerciseTypes }
+    val exList = remember { viewModel.exList }
+
 
     //State reference
     val screenState by remember { viewModel.dayScreenState }
     //holds date on select from calendar and on open app.
-    var date: LocalDate by remember { mutableStateOf(LocalDate.now()) }
-
+    //var dateString = remember { viewModel.date.value.toString() }
+    var date = remember { viewModel.dateIn }
     //holder for passing data back to UI from viewmodel
     var exerciseBundle = remember { viewModel.exerciseBundleMain }
 
     //Controls Calendar state
     var exState by remember { mutableStateOf(false) }
+//    MaterialTheme(
+//        colorScheme = MaterialTheme.colorScheme,
+//        shapes = MaterialTheme.shapes,
+//        typography = MaterialTheme.typography
+//    ) {
+
 
     //holder for main screen
     Column(
@@ -73,917 +87,243 @@ fun DayScreen(
                 animationSpec = tween(
                     durationMillis = 300
                 )
-            ),
+            )
+            .background(color = MaterialTheme.colorScheme.background),
+
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
-    ) { //fades in/out child elements
-        AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
-
-            ExpandCalendar(updateDay = {
-                date = it //date lambda
-                viewModel.updateDate(it) //updating vm
-            })
-        }
-
-
-        //Holder for top bar buttons and stuff
-        Row(
-            modifier = Modifier
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                modifier = Modifier.weight(2f)
-            ) {
-                //opens calendar
-                IconButton(
-                    modifier = Modifier
-                        .alpha(ContentAlpha.medium),
-                    onClick = {
-                        exState = !exState
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Sharp.CalendarViewWeek,
-                        contentDescription = "switch to month view"
-                    )
-                }
-            }
-            //does nothing currently
-            IconButton(
-                modifier = Modifier
-                    .alpha(ContentAlpha.medium),
-                onClick = {
-                    viewModel.openSelection()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "selectionview"
-                )
-
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(0.305f)
-        ) {
-            OutlinedTextField(
-                value = date.toString(),
-                onValueChange = {/*Check for day data and load */
-                },
-                enabled = false,
-            )
-        }
+    ) { //fades in/out child element
         when (screenState) {
             DayViewModel.DayScreenState.LAUNCH -> {
-                Button(onClick = {
-                    viewModel.getSetDataForDate()
-                }) {
+                TopAppBar(viewModel = viewModel, date = date)
 
-                }
             }
             DayViewModel.DayScreenState.LOADING -> {
                 Text(text = "Loading")
             }
             DayViewModel.DayScreenState.LOADED -> {
+                Log.d(TAG, "ExBundle SIZE ---> " + exerciseBundle.size.toString())
+
+                TopAppBar(viewModel = viewModel, date = date)
+
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    TextField(value = exerciseBundle.size.toString(), onValueChange = {})
-                    exerciseBundle.forEachIndexed { index, element ->
-                        ExpandableExerciseCard(
-                            movement = element.get(index),
-                            date = date,
-                            exercises = element
-                        )
-                    }
+                        exerciseBundle.forEachIndexed { index, element ->
+                            if(element[0] != null) {
+                                ExpandableExerciseCard(
+                                    movement = element.get(0),
+                                    date = date.value,
+                                    exercises = exerciseBundle.get(index)
+                                )
+                            }
+                        }
 
 
                 }
             }
             DayViewModel.DayScreenState.SELECT -> {
+                //viewModel.filterTypeList()
                 SelectionColumn(exerciseList = typeList.value, viewModel = viewModel)
+                //Divider(modifier = Modifier.fillMaxWidth(1f))
             }
 
         }
     }
+    //}
 }
 
-
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SelectionColumn(
-    exerciseList:List<AllExercises>,
-    viewModel: DayViewModel
-){
-    Column(modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly){
-        exerciseList.forEach{ it
-            SelectionCard(movement = it, viewModel = viewModel)
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun SelectionCard(
-    movement:AllExercises,
-    viewModel: DayViewModel
-){
-
-    Card(modifier = Modifier.fillMaxWidth(0.95f),
-    onClick = {
-        viewModel.exerciseBundleMain.add(mutableListOf(movement))
-    }) {
-         Text(movement.name)
-    }
-}
-
-
-
-//Will hold exercise title and relevant information as it is logged
-@ExperimentalMaterialApi
-@Composable
-fun ExpandableExerciseCard(
-    movement: AllExercises,
-    titleFontSize: TextUnit = MaterialTheme.typography.h6.fontSize,
-    titleFontWeight: FontWeight = FontWeight.Bold,
-    width: Float = 1.0f,
-    padding: Dp = 10.dp,
-    date: LocalDate,
-    exercises: MutableList<AllExercises>
+fun TopAppBar(
+    viewModel: DayViewModel,
+    date: MutableState<LocalDate>
 ) {
-    var bruh: Long = 0
-    //for tracking how many sets have been logged, just increments in a lambda
-    var setsSoFar by remember { mutableStateOf(bruh) }
+    var exState by remember { mutableStateOf(false) }
+    val formatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+    AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
 
-    //card title
-    val title = movement.name
-
-    //managed expanded state of the set log pop up
-    var expandedState by remember { mutableStateOf(false) }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(width)
-            .animateContentSize(
-                animationSpec = tween(
-                    durationMillis = 300
-                )
-            )
-            .padding(padding)
-            .shadow(3.dp),
-        shape = Shapes.medium,
-        onClick = {
-            expandedState = !expandedState
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                //test widget
-                Text(
-                    text = title,
-                    fontSize = titleFontSize,
-                    fontWeight = titleFontWeight,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.alpha(alpha = 0.8f)
-                )
-                Text(
-                    text = setsSoFar.toString()
-                )
-
-            }
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth(0.99f)
-                        .padding(start = 0.dp, top = 10.dp, bottom = 5.dp, end = 0.dp)
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(0.99f),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-
-                    Text(
-                        "Set No.",
-                        fontSize = 14.sp,
-                        modifier = Modifier.weight(0.98f),
-                        textAlign = TextAlign.Start
-                    )
-
-                    Text(
-                        "Lever",
-                        fontSize = 14.sp,
-                        modifier = Modifier.weight(1.0f),
-                        textAlign = TextAlign.Start
-                    )
-
-                    Text(
-                        "Hold Time",
-                        fontSize = 14.sp,
-                        modifier = Modifier.weight(1.4f),
-                        textAlign = TextAlign.Start
-                    )
-
-                    Text(
-                        "Assist",
-                        fontSize = 14.sp,
-                        modifier = Modifier.weight(1.1f),
-                        textAlign = TextAlign.Start
-                    )
-
-                    Text(
-                        "SiR",
-                        fontSize = 14.sp,
-                        modifier = Modifier.weight(0.9f),
-                        textAlign = TextAlign.Start
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Column{
-                    exercises.forEach { exercise ->
-                        CondensedSetRow(movement = exercise)
-
-                    }
-                }
-            }
-
-            //popup controller, will have different popups maybe? not sure
-            if (expandedState) {
-
-                if (movement is Statics) {
-
-                    StaticsAddSetPopUp(
-                        movement = movement,
-                        date = date,
-                        setsSoFar = setsSoFar
-                    ) { setsSoFar = it }
-                    //StaticsTextFields(movement = movement)
-                } else if (movement is Dynamics) {
-                    //  DynamicsTextFields(movement = movement)
-                }
-            }
-        }
+        ExpandCalendar(updateDay = {
+            //date lambda
+            viewModel.updateDate(it) //updating vm
+        })
     }
-}
 
-@Composable
-fun CondensedSetRow(
-    movement: AllExercises
-) {
 
+    //Holder for top bar buttons and stuff
     Row(
-        modifier = Modifier.fillMaxWidth(0.99f),
+        modifier = Modifier
+            .padding(10.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
-    )
-    {
-        if (movement is Statics) {
-            Text(
-                movement.setNumber.toString(),
-                fontSize = 14.sp,
-                modifier = Modifier.weight(0.98f),
-                textAlign = TextAlign.Start
-            )
+    ) {
+        //opens calendar
+        IconButton(
+            modifier = Modifier
+                .alpha(.8f)
+                .weight(1f),
+            onClick = {
+                exState = !exState
+            },
 
-            Text(
-                movement.progression,
-                fontSize = 14.sp,
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Start
-            )
-
-            Text(
-                movement.holdTime,
-                fontSize = 14.sp,
-                modifier = Modifier.weight(1.4f),
-                textAlign = TextAlign.Start
-            )
-
-            Text(
-                movement.weight,
-                fontSize = 14.sp,
-                modifier = Modifier.weight(1.1f),
-                textAlign = TextAlign.Start
-            )
-
-            Text(
-                movement.sir,
-                fontSize = 14.sp,
-                modifier = Modifier.weight(0.9f),
-                textAlign = TextAlign.Start
-            )
-        } else if (movement is Dynamics) {
-            //TODO
-        }
-    }
-}
-
-@Composable
-fun StaticsAddSetPopUp(
-    movement: Statics,
-    date: LocalDate,
-    viewModel: DayViewModel = hiltViewModel(),
-    setsSoFar: Long,
-    updateSetNumber: (Long) -> Unit
-) {
-    var openDialog by remember { mutableStateOf(true) }
-    var textContentProgression by remember { mutableStateOf("") }
-    var textContentAssistance by remember { mutableStateOf("") }
-    var textContentTime by remember { mutableStateOf("") }
-    var textContentSiR by remember { mutableStateOf("") }
-    var test by remember { mutableStateOf("Add") }
-    if (openDialog) {
-        Dialog(
-            onDismissRequest = { openDialog = false },
-            properties = DialogProperties()
-        ) {
-            Card(
-                modifier = Modifier
-                    .size(300.dp, 370.dp)
-                    .background(Color.White),
             ) {
-                Column(
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    DropDownTextField(
-                        label = "Progression",
-                        movement = movement
-                    ) {
-                        textContentProgression = it
-                        movement.progression = it
-                    }
-                    TimeIncrementTextField(
-                        label = "Time",
-                        movement = movement,
-                        trailingLabel = "sec",
-                        onDataChanged = {
-                            textContentTime = it
-                            movement.holdTime = it
-                        }
-                    )
-                    WeightIncrementTextField(
-                        movement = movement,
-                        label = "Assistance",
-                        trailingLabel = "kg."
-                    ) {
-                        textContentAssistance = it
-                        movement.weight = it
-                    }
-                    TimeIncrementTextField(
-                        movement = movement,
-                        label = "SiR",
-                        trailingLabel = "sec"
-                    ) {
-                        textContentSiR = it
-                        movement.sir = it
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-
-                        //add set
-                        Button(
-
-                            onClick = {
-                                updateSetNumber(setsSoFar + 1)
-                                movement.setNumber = setsSoFar
-                                /*PASS DATA TO VIEWMODEL, IMMEDIATELY MAKE NEW DOCUMENT*/
-                                viewModel.addStaticsSet(
-                                    movement
-                                )
-                                openDialog = false
-
-                            },
-                            elevation = ButtonDefaults.elevation(0.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent)
-                        ) {
-                            Text(text = textContentTime)
-                        }
-                        //cancel add
-                        Button(
-                            onClick = { openDialog = false },
-                            elevation = ButtonDefaults.elevation(0.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent)
-                        ) {
-                            Text(text = "Cancel")
-                        }
-                    }
-
-
-                }
-
-
-            }
-        }
-    }
-
-}
-
-//custom TextField and +/- widgets
-@Composable
-fun WeightIncrementTextField(
-    movement: Statics,
-    label: String,
-    trailingLabel: String,
-    onDataChanged: (String) -> Unit
-) {
-    var content by remember { mutableStateOf("0") }
-    var trailingIconText by remember { mutableStateOf(trailingLabel) }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.Start
-    ) {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth(.8f)
-                .scale(scaleY = 0.9f, scaleX = 1f),
-            value = content,
-            label = {
-                Text(text = label)
-            },
-            onValueChange = {
-                content = it
-                onDataChanged(it)
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = brightGrey,
-                focusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            textStyle = TextStyle(
-                color = Color.Black,
-                fontSize = 15.sp,
-                textAlign = TextAlign.Start
-            ),
-            shape = MaterialTheme.shapes.medium,
-            trailingIcon = {
-                Button(
-                    elevation = ButtonDefaults.elevation(0.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-                    onClick = {
-                        if (trailingIconText.equals("kg."))
-                            trailingIconText = "lb."
-                        else
-                            trailingIconText = "kg."
-                    }) {
-                    Text(text = trailingIconText)
-                }
-            }
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .weight(0.5f)
-                .padding(top = 4.dp)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.padding(start = 5.dp)
+            Icon(
+                imageVector = Icons.Sharp.CalendarViewWeek,
+                contentDescription = "switch to month view",
+                tint = MaterialTheme.colorScheme.primary
             )
-            {
-                IconButton(
-                    onClick = {
-                        if (content.isDigitsOnly()) {
-                            content = (content.toInt() + 1).toString()
-                            onDataChanged(content)
-                        } else
-                            content = 0.toString()
-                    },
-                    modifier = Modifier.size(19.dp)
-                ) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = "increment-seconds")
-                }
-                IconButton(onClick = {
-                    if (content.toInt() > 0) {
-                        content = (content.toInt() - 1).toString()
-                        onDataChanged(content)
-                    } else if (!content.isDigitsOnly()) {
-                        content = 0.toString()
-                    }
-
-                }, modifier = Modifier.size(21.dp)) {
-                    Icon(
-                        imageVector = Icons.Filled.Minimize,
-                        contentDescription = "decrement-seconds",
-                        // modifier = Modifier.scale(scaleX = 1.05f, scaleY = 1.05f),
-
-                    )
-                }
-            }
         }
-
-    }
-}
-
-
-//same as weight, gotta combine these later
-@Composable
-fun TimeIncrementTextField(
-    movement: Statics,
-    label: String,
-    trailingLabel: String,
-    onDataChanged: (String) -> Unit
-) {
-    var content by remember { mutableStateOf("0") }
-    var trailingIconText by remember { mutableStateOf("sec.") }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.Start
-    ) {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth(.8f)
-                .scale(scaleY = 0.9f, scaleX = 1f),
-            value = content,
-            label = {
-                Text(text = label)
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            onValueChange = {
-                content = it
-                onDataChanged(it)
-
-                // movement.holdTime = it
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = brightGrey,
-                focusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            textStyle = TextStyle(
-                color = Color.Black,
-                fontSize = 15.sp,
-                textAlign = TextAlign.Start
-            ),
-            shape = MaterialTheme.shapes.medium,
-            trailingIcon = {
-                Button(
-                    elevation = ButtonDefaults.elevation(0.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-                    onClick = {
-
-                    }) {
-                    Text(text = trailingIconText)
-                }
-            }
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .weight(0.5f)
-                .padding(top = 4.dp)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.padding(start = 5.dp)
-            )
-            {
-                IconButton(
-                    onClick = {
-                        content = (content.toInt() + 1).toString()
-                        onDataChanged(content)
-                    },
-                    modifier = Modifier.size(19.dp)
-                ) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = "increment-seconds")
-                }
-                IconButton(onClick = {
-                    content = (content.toInt() - 1).toString()
-                    onDataChanged(content)
-                }, modifier = Modifier.size(21.dp)) {
-                    Icon(
-                        imageVector = Icons.Filled.Minimize,
-                        contentDescription = "decrement-seconds",
-                        modifier = Modifier.scale(scaleX = 1.05f, scaleY = 1.05f)
-                    )
-                }
-            }
-        }
-
-    }
-}
-
-
-//Textfield with a dropdown menu, currently doesnt take a list as input but could add
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun DropDownTextField(
-    movement: Statics,
-    label: String,
-    onDataChanged: (String) -> Unit
-) {
-    var prog by remember { mutableStateOf("") }
-    var dropdown by remember { mutableStateOf(false) }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.Start
-    ) {
-        TextField(
-            value = prog,
-            label = { Text(text = label) },
-            leadingIcon = {
-                IconButton(
-                    onClick = { dropdown = true }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowDropDown,
-                        contentDescription = "drop-down-arrow"
-                    )
-                }
-            },
-            onValueChange = { prog = it },
-            readOnly = true,
-            enabled = false,
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = brightGrey,
-                focusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Black,
-            ),
-            textStyle = TextStyle(
-                color = Color.Black,
-                fontSize = 15.sp,
-                textAlign = TextAlign.Start
-            ),
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.scale(scaleY = 0.9f, scaleX = 1f),
-        )
-        DropdownMenu(expanded = dropdown, onDismissRequest = { dropdown = false }) {
-            var progList = Progressions().progressions
-            progList.forEachIndexed { index, item ->
-                DropdownMenuItem(onClick = {
-                    prog = progList.get(index)
-                    onDataChanged(prog)
-                    dropdown = false
-                }) {
-                    Text(text = progList.get(index))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun customCalendar(
-    state: Boolean,
-    updateDay: (LocalDate) -> Unit
-) {
-    if (state) {
-        MaterialTheme(
-            colors = Colors(
-                primary = Color.White,
-                primaryVariant = davysGrey,
-                secondary = davysGrey,
-                secondaryVariant = davysGrey,
-                background = davysGrey,
-                surface = davysGrey,
-                error = Color.Red,
-                onPrimary = brightGrey,
-                onSecondary = davysGrey,
-                onBackground = davysGrey,
-                onSurface = davysGrey,
-                onError = davysGrey,
-                isLight = true
-            )
-        ) {
-            Kalendar(
-                kalendarType = KalendarType.Oceanic(),
-                kalendarStyle = KalendarStyle(
-                    kalendarBackgroundColor = Color.White,
-                    kalendarColor = Color.White,
-                    elevation = 0.dp,
-                    //kalendarSelector = KalendarSelector.CutCornerSquare(),
-                    shape = KalendarShape.ButtomCurvedShape,
-                    kalendarSelector = KalendarSelector.Dot(
-                        selectedColor = MaterialTheme.colors.primaryVariant,
-                        todayColor = spanishGrey,
-                        selectedTextColor = Color.Black,
-                        defaultTextColor = Color.Black,
-                        eventTextColor = Color.White,
-                        defaultColor = Color.White
-                    )
-                ),
-
-                onCurrentDayClick = { day, event ->
-                    updateDay(day)
-                },
-                errorMessage = {
-                    //Handle the error if any
-                })
-
-        }
-    } else {
-        MaterialTheme(
-            colors = Colors(
-                primary = Color.White,
-                primaryVariant = davysGrey,
-                secondary = davysGrey,
-                secondaryVariant = davysGrey,
-                background = davysGrey,
-                surface = davysGrey,
-                error = Color.Red,
-                onPrimary = brightGrey,
-                onSecondary = davysGrey,
-                onBackground = davysGrey,
-                onSurface = davysGrey,
-                onError = davysGrey,
-                isLight = true
-            )
-        ) {
-            Kalendar(
-                kalendarType = KalendarType.Firey(),
-                kalendarStyle = KalendarStyle(
-                    kalendarBackgroundColor = Color.White,
-                    kalendarColor = Color.White,
-                    elevation = 0.dp,
-                    //kalendarSelector = KalendarSelector.CutCornerSquare(),
-                    shape = KalendarShape.ButtomCurvedShape,
-                    kalendarSelector = KalendarSelector.Dot(
-                        selectedColor = MaterialTheme.colors.primaryVariant,
-                        todayColor = spanishGrey,
-                        selectedTextColor = Color.Black,
-                        defaultTextColor = Color.Black,
-                        eventTextColor = Color.White,
-                        defaultColor = Color.White
-                    )
-                ),
-
-                onCurrentDayClick = { day, event ->
-                    updateDay(day)
-                    //handle the date click listener
-                },
-                errorMessage = {
-                    //Handle the error if any
-                })
-
-        }
-    }
-}
-
-
-@RequiresApi(Build.VERSION_CODES.O)
-@ExperimentalMaterialApi
-@Composable
-fun ExpandCalendar(
-    titleFontSize: TextUnit = MaterialTheme.typography.h6.fontSize,
-    titleFontWeight: FontWeight = FontWeight.Bold,
-    width: Float = 1.0f,
-    padding: Dp = 10.dp,
-    updateDay: (LocalDate) -> Unit
-) {
-    var expandedState by remember { mutableStateOf(true) }
-    var curDate by remember { mutableStateOf(LocalDate.now()) }
-
-    val rotationState by animateFloatAsState(
-        targetValue =
-        if (expandedState) 180f
-        else 0f
-    )
-
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(width)
-            .animateContentSize(
-                animationSpec = tween(
-                    durationMillis = 300,
-                    easing = LinearOutSlowInEasing
-                )
-            )
-            .padding(padding)
-            .shadow(10.dp),
-        shape = Shapes.medium,
-        onClick = {
-            expandedState = !expandedState
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(0.dp)
-        ) {
-
-            var animationState by remember { mutableStateOf(true) }
-            var animationStateExpanded by remember { mutableStateOf(false) }
-
-            if (expandedState) {
-
-                customCalendar(expandedState, updateDay = {
-                    updateDay(it)
-                })
-
-
-            } else {
-
-
-                customCalendar(expandedState) {
-                    updateDay(it)
-                }
-
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    modifier = Modifier
-                        .alpha(ContentAlpha.medium)
-                        .weight(1f)
-                        .rotate(rotationState),
-                    onClick = {
-                        expandedState = !expandedState
-                    }
-                ) {
-                    if (expandedState) {
-                        Icon(
-                            imageVector = Icons.Filled.CalendarViewMonth,
-                            contentDescription = "switch to month view"
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Filled.CalendarViewWeek,
-                            contentDescription = "switch to week view"
-                        )
-                    }
-                }
-            }
-
-
-        }
-    }
-}
-
-//@OptIn(ExperimentalMaterialApi::class)
-//@Composable
-//fun DropDownCustomItem(
-//    content: String,
+//        OutlinedTextField(
+//            value = dateString,
+//            modifier = Modifier.width(200.dp),
+//            onValueChange = {
 //
-//    ) {
-//    Card(
-//        modifier = Modifier.fillMaxWidth(0.95f),
-//        onClick = {}
-//    ) {
-//        Text(text = content)
-//    }
-//}
+//            },
+//
+//
+//            textStyle = TextStyle(textAlign = TextAlign.Center,
+//                fontSize = 20.sp),
+//        )
+        Text(formatter.format(date.value), color = MaterialTheme.colorScheme.primary)
+        //does nothing currently
+        IconButton(
+            modifier = Modifier
+                .alpha(.8f)
+                .weight(1f),
+            onClick = {
+                viewModel.openSelection()
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "selectionview",
+                tint = MaterialTheme.colorScheme.primary
+            )
 
+        }
+    }
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ComposeDemo(
+fun SelectionColumn(
+    exerciseList: List<AllExercises>,
+    viewModel: DayViewModel
+) {
+
+    Scaffold(topBar = {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(onClick = { viewModel.closeSelection() })
+            {
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "backToDayView")
+            }
+            Text(text = "Exercises", fontSize = MaterialTheme.typography.titleLarge.fontSize)
+        }
+
+    }) { contentPadding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(contentPadding)
+                .background(MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+        ) {
+            Divider(modifier = Modifier
+                .fillMaxWidth(1f)
+                .alpha(0.4f), color = MaterialTheme.colorScheme.onBackground)
+            exerciseList.forEach {
+                it
+                SelectionCard(movement = it, viewModel = viewModel, "selectionItem")
+                Divider(modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .alpha(0.4f), color = MaterialTheme.colorScheme.onBackground )
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SelectionCard(
+    movement: AllExercises,
+    viewModel: DayViewModel,
+    contentDescription: String,
 ) {
     Column(
-
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
 
+        Column(
+            modifier = Modifier
+                .clickable(true, onClick = {
+                    viewModel.exerciseBundleMain.add(mutableStateListOf(movement))
+                    viewModel.closeSelection()
+                })
+                .fillMaxWidth(1f)
+                .height(60.dp)
+
+        ) {
+            //Divider(modifier = Modifier.fillMaxWidth(1f).alpha(0.6f), )
+            Row(
+                modifier = Modifier.padding(10.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    painter = painterResource(id = movement.iconId),
+                    contentDescription = contentDescription,
+                    modifier = Modifier
+                        .scale(scaleX = 2f, scaleY = 2f)
+                        .padding(10.dp)
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight(),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    Text(
+                        movement.name,
+                        modifier = Modifier.padding(start = 5.dp),
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                    IconButton(onClick = { /*TODO Go to a details screen*/ },) {
+                        Icon(imageVector = Icons.Filled.Menu, contentDescription = "Bruh")
+
+                    }
+                }
+            }
+
+        }
+        //Divider(modifier = Modifier.fillMaxWidth(1f))
+
+
     }
-    Row(
-
-    ) {
-
-    }
-    Card(
-
-    ) {
-
-    }
-    Box() {
-
-    }
-
 }
+
+
+
+
