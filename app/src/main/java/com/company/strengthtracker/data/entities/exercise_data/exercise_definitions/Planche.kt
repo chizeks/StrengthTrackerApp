@@ -1,7 +1,13 @@
 package com.company.strengthtracker.data.entities.exercise_data.exercise_definitions
 
+import android.graphics.drawable.Drawable
+import com.company.strengthtracker.R
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.ExState
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
+
+
+
+
 
 class Planche(
     name: String = "Planche",
@@ -10,7 +16,8 @@ class Planche(
     sir: String = "",
     progression: String = "",
     setNumber: Long = -1,
-    exType: ExState = ExState.STATIC
+    override val exType: ExState = ExState.STATIC,
+    override val iconId: Int = R.drawable.ic_action_name
 ) : Statics(
     name = name,
     weight = weight,
@@ -18,7 +25,5 @@ class Planche(
     progression = progression,
     sir = sir,
     setNumber = setNumber,
-) {
-    override var exType = exType
-
-}
+    iconId = iconId
+)

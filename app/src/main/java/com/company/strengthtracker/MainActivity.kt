@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.material.ExperimentalMaterialApi
+
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.company.strengthtracker.presentation.forgot_password_screen.ForgotPasswordScreen
@@ -24,7 +24,6 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @ExperimentalCoroutinesApi
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
-    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -35,7 +34,7 @@ class MainActivity : ComponentActivity() {
                 // NavHost defines all possible screens
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.DayScreen.route
+                    startDestination = Screen.LoginScreen.route
                 ) {
                     // Each composable() represents a Screen; pass in composable which represent screen
                     composable(route = Screen.LoginScreen.route) {
