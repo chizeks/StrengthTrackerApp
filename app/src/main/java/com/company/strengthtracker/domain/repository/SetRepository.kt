@@ -13,5 +13,5 @@ import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 
 interface SetRepository {
-   suspend fun setUpdater(date:String): Task<QuerySnapshot>
+
 }
