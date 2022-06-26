@@ -130,11 +130,18 @@ class DayViewModel @Inject constructor(
             if(exerciseBundleMain.size < 1){
                 dayScreenState.value = DayScreenState.LOADED
             }
+
             else if (exerciseBundleMain.size > 0) {
                 dayScreenState.value = DayScreenState.SELECT
             }
         }
     }
+
+
+        }
+      }
+
+
 
     fun addStaticsSet(
         movement: AllExercises
