@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,13 +26,14 @@ import com.company.strengthtracker.Screen
 import com.company.strengthtracker.presentation.register_screen.RegisterViewModel.RegisterScreenState.*
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember{SnackbarHostState()}
+    val snackbarHostState = remember{ SnackbarHostState() }
 
     val screenState by remember { viewModel.registerScreenState }
     val context = LocalContext.current
@@ -44,8 +46,8 @@ fun RegisterScreen(
             Column {
                 Text(text = "successful registration")
                 Button(onClick = {
-                    navController.navigate(Screen.LoginScreen.route) {
-                        popUpTo(Screen.LoginScreen.route) {
+                    navController.navigate(Screen.DayScreen.route) {
+                        popUpTo(Screen.DayScreen.route) {
                             inclusive = true
                         }
                     }

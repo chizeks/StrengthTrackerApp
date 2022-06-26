@@ -7,8 +7,10 @@ open class Dynamics(
     reps:String = "",
     rir: String = "",
     setNumber:Long = -1,
-    exType:ExState = DYNAMIC
+    override val exType:ExState = DYNAMIC,
+    override val iconId:Int = -1,
 ):AllExercises(name=name, weight = weight, setNumber = setNumber) {
+
     override var name = name
     override var weight = weight
     open var reps = reps
