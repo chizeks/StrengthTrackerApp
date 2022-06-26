@@ -26,6 +26,7 @@ import com.company.strengthtracker.data.entities.exercise_data.main_categories.A
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
 import java.time.LocalDate
 
+//please merge
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable 
 fun GenericAddPopUp(
