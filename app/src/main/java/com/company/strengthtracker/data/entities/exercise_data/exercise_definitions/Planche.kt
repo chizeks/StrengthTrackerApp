@@ -26,6 +26,7 @@ class Planche(
     displayFields:List<Boolean>,
     override val exType: ExState = ExState.STATIC,
     override val iconId: Int = R.drawable.ic_action_name
+//hello
 ) : Statics(
     name = name,
     weight = weight,
