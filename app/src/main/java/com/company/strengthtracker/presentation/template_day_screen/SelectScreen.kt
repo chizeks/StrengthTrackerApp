@@ -36,8 +36,6 @@ fun GenericAddPopUp(
 ) {
     var openDialog by remember { mutableStateOf(true) }
 
-    var textContentTime by remember { mutableStateOf("") }
-
     if (openDialog) {
         Dialog(
             onDismissRequest = { openDialog = false },

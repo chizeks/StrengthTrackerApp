@@ -5,6 +5,7 @@ import com.google.common.math.IntMath
 
 open class Statics(
     name: String = "",
+
     holdTime: String = "",
     weight: String = "",
     sir: String = "",
