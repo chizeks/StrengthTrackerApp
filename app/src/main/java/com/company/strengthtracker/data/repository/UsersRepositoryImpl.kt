@@ -33,9 +33,7 @@ class UsersRepositoryImpl @Inject constructor(
         val allExercisesRef = db.collection(userUid)
             .document(date)
             .collection(date).get().await()
-        Log.d(TAG, "awaited  ex fetch and Size is {${allExercisesRef.documents.size}}")
         allExercisesRef?.documents?.forEach { exercise ->
-            Log.d(TAG, "${exercise.get("name").toString()}")
             if (exercise != null) {
                 val exName = exercise.get("name").toString()
                 val exType = exercise.get("exType").toString()
@@ -45,9 +43,7 @@ class UsersRepositoryImpl @Inject constructor(
                     .document(exName)
                     .collection(exName).get().await()
 
-                Log.d(TAG, "awaited set  fetch and size is ${setRef.documents.size}")
                 setRef?.documents?.forEach { set ->
-                    Log.d(TAG, "${set.get("name").toString()}")
                     if (set != null) {
                         if (exType == "STATIC") {
                             setBundle.add(
@@ -76,21 +72,16 @@ class UsersRepositoryImpl @Inject constructor(
                             )
                             Log.d(TAG, "ADDING DYNAMIC SET")
                         }
-                    } else {
-
                     }
                 }
                 if (exerciseBundle.size == 1 && exerciseBundle[0][0].name == setBundle[0].name
                 ) {
-                    Log.d(TAG, "Adding set bundle as replacement " + setBundle.size)
                     exerciseBundle[0] = setBundle
                 } else {
-                    Log.d(TAG, "Adding set bundle as addition " + setBundle.size)
                     exerciseBundle.add(setBundle)
                 }
             }
         }
-        Log.d(TAG, "RETURNING RESOURCE SUCCESS exBundle size ---> ${exerciseBundle.size}")
         return Resource.Success(exerciseBundle)
     }
 

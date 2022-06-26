@@ -4,6 +4,7 @@ import com.company.strengthtracker.data.entities.exercise_data.main_categories.E
 
 open class Statics(
     name: String = "",
+
     holdTime: String = "",
     weight: String = "",
     sir: String = "",

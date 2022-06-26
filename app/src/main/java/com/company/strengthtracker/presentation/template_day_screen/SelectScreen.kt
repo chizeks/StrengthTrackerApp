@@ -37,7 +37,9 @@ fun GenericAddPopUp(
     //controller boolean for state of pop up
     var openDialog by remember { mutableStateOf(true) }
 
+
     //display dialog
+
     if (openDialog) {
         Dialog(
             //dismissing open dialog
