@@ -54,6 +54,8 @@ fun DayScreen(
     viewModel: DayViewModel = hiltViewModel(),
 ) {
     val typeList = remember {viewModel.exerciseTypes}
+    val exList = remember {viewModel.exList}
+
 
     //State reference
     val screenState by remember { viewModel.dayScreenState }
@@ -147,6 +149,7 @@ fun DayScreen(
                 }) {
 
                 }
+
                 exerciseBundle.forEachIndexed { index, element ->
                     ExpandableExerciseCard(
                         movement = element.get(index),
@@ -159,6 +162,10 @@ fun DayScreen(
                 Text(text = "Loading")
             }
             DayViewModel.DayScreenState.LOADED -> {
+
+
+
+
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.SpaceEvenly,
@@ -166,15 +173,33 @@ fun DayScreen(
                 ) {
 
                     exerciseBundle.forEachIndexed { index, element ->
-                        ExpandableExerciseCard(
-                            movement = element.get(index),
-                            date = date,
-                            exercises = element
-                        )
+                            ExpandableExerciseCard(
+                                movement = element.get(0),
+                                date = date,
+                                exercises = exerciseBundle.get(index)
+                            )
                     }
-
-
                 }
+            }
+            DayViewModel.DayScreenState.LOADING -> {
+                Text(text = "Loading")
+            }
+            DayViewModel.DayScreenState.LOADED -> {
+//                Column(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    verticalArrangement = Arrangement.SpaceEvenly,
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    exerciseBundle.forEachIndexed { index, element ->
+//                        ExpandableExerciseCard(
+//                            movement = element.get(0),
+//                            date = date,
+//                            exercises = exerciseBundle.get(index)
+//                        )
+//                    }
+//
+//
+//                }
             }
             DayViewModel.DayScreenState.SELECT -> {
                 SelectionColumn(exerciseList = typeList.value, viewModel = viewModel)
@@ -211,7 +236,8 @@ fun SelectionCard(
 
     Card(modifier = Modifier.fillMaxWidth(0.95f),
     onClick = {
-
+        viewModel.exerciseBundleMain.add(mutableStateListOf(movement))
+        viewModel.closeSelection()
     }) {
          Text(movement.name, fontSize = 20.sp, modifier = Modifier.padding(50.dp))
     }
@@ -274,10 +300,6 @@ fun ExpandableExerciseCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.alpha(alpha = 0.8f)
                 )
-                Text(
-                    text = setsSoFar.toString()
-                )
-
             }
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -337,7 +359,6 @@ fun ExpandableExerciseCard(
                 Column{
                     exercises.forEach { exercise ->
                         CondensedSetRow(movement = exercise)
-
                     }
                 }
             }
@@ -374,7 +395,7 @@ fun CondensedSetRow(
     {
         if (movement is Statics) {
             Text(
-                movement.setNumber.toString(),
+                text = "",
                 fontSize = 14.sp,
                 modifier = Modifier.weight(0.98f),
                 textAlign = TextAlign.Start
