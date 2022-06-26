@@ -11,13 +11,22 @@ import com.company.strengthtracker.data.entities.exercise_data.main_categories.S
 
 class Planche(
     name: String = "Planche",
+    //hold time per set
     holdTime: String = "",
+    //holds per set
+    reps: String = "",
+    //weight or assist per set
     weight: String = "",
+    //seconds in reserve
     sir: String = "",
+    //progression
     progression: String = "",
+    //IDK
     setNumber: Long = -1,
+    displayFields:List<Boolean>,
     override val exType: ExState = ExState.STATIC,
     override val iconId: Int = R.drawable.ic_action_name
+//hello
 ) : Statics(
     name = name,
     weight = weight,
