@@ -28,6 +28,8 @@ import com.company.strengthtracker.data.entities.exercise_data.exercise_definiti
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
 import java.time.LocalDate
 
+
+//Popup that holds buttons for adding a set, as well as input text fields
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StaticsAddSetPopUp(
@@ -46,10 +48,11 @@ fun StaticsAddSetPopUp(
             onDismissRequest = { openDialog = false },
             properties = DialogProperties(),
 
-        ) {
+            ) {
             Card(
                 modifier = Modifier
-                    .size(300.dp, 370.dp).background(MaterialTheme.colorScheme.surfaceVariant),
+                    .size(300.dp, 370.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 shape = RoundedCornerShape(10.dp)
 //
             ) {
@@ -67,9 +70,8 @@ fun StaticsAddSetPopUp(
                     TimeIncrementTextField(
                         label = "Time",
                         movement = movement,
-                        trailingLabel = "sec",
+                        trailingLabel = "sec.",
                         onDataChanged = {
-                            textContentTime = it
                             movement.holdTime = it
                         }
                     )
@@ -99,8 +101,7 @@ fun StaticsAddSetPopUp(
                         Button(
 
                             onClick = {
-                                updateSetNumber(setsSoFar + 1)
-                                movement.setNumber = setsSoFar
+
                                 /*PASS DATA TO VIEWMODEL, IMMEDIATELY MAKE NEW DOCUMENT*/
                                 viewModel.addNewSet(
                                     movement
@@ -109,15 +110,21 @@ fun StaticsAddSetPopUp(
 
                             },
                             elevation = ButtonDefaults.buttonElevation(0.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent,
+                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         ) {
-                            Text(text = textContentTime)
+                            Text(text = "Add")
                         }
                         //cancel add
                         Button(
                             onClick = { openDialog = false },
                             elevation = ButtonDefaults.buttonElevation(0.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent,
+                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         ) {
                             Text(text = "Cancel")
                         }
@@ -352,7 +359,7 @@ fun DropDownTextField(
     ) {
         OutlinedTextField(
             value = prog,
-            label = { Text(text = label, modifier = Modifier.alpha(1f))  },
+            label = { Text(text = label, modifier = Modifier.alpha(1f)) },
             leadingIcon = {
                 IconButton(
                     onClick = { dropdown = true }
@@ -379,7 +386,7 @@ fun DropDownTextField(
             ),
             shape = MaterialTheme.shapes.medium,
 
-        )
+            )
         DropdownMenu(expanded = dropdown, onDismissRequest = { dropdown = false }) {
             var progList = Progressions().progressions
             progList.forEachIndexed { index, item ->
