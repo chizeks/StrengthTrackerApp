@@ -52,7 +52,7 @@ fun GenericAddPopUp(
             //Card container
             Card(
                 modifier = Modifier
-                    .size(300.dp, 370.dp)
+                    .size(300.dp, 340.dp)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 shape = RoundedCornerShape(10.dp)
 //

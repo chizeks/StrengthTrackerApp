@@ -1,5 +1,6 @@
 package com.company.strengthtracker.presentation.template_day_screen
 
+import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.os.Build
 import android.util.Log
@@ -10,7 +11,9 @@ import androidx.lifecycle.viewModelScope
 import com.company.strengthtracker.data.entities.User
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.*
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
+import com.company.strengthtracker.data.repository.SetRepositoryImpl
 import com.company.strengthtracker.data.repository.UsersRepositoryImpl
+import com.company.strengthtracker.domain.use_cases.UpdateViewmodelLogUseCase
 import com.company.strengthtracker.domain.util.Resource
 import com.company.strengthtracker.presentation.register_screen.RegisterViewModel
 import com.google.firebase.firestore.ktx.firestore
@@ -28,7 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DayViewModel @Inject constructor(
     private val authRepositoryImpl: AuthRepositoryImpl,
-    private val usersRepositoryImpl: UsersRepositoryImpl
+    private val setRepositoryImpl: SetRepositoryImpl,
+    private val updateViewModel: UpdateViewmodelLogUseCase,
 ) : ViewModel() {
     // registerScreenState.value = RegisterScreenState.LOADING
 
@@ -41,7 +45,7 @@ class DayViewModel @Inject constructor(
 
     //state enum for UI control
     enum class DayScreenState {
-        LAUNCH, LOADING, LOADED, SELECT, SELECTED
+        LAUNCH, LOADING, LOADED, SELECT, EMPTY, ERROR
     }
 
 
@@ -67,6 +71,7 @@ class DayViewModel @Inject constructor(
     var date = mutableStateOf(formatter.format(dateIn.value))
 
     fun updateDate(newValue: LocalDate) {
+        dayScreenState.value = DayScreenState.LOADING
         _dateIn.value = newValue
         exerciseBundleMain.clear()
         getSetDataForDate()
@@ -78,126 +83,48 @@ class DayViewModel @Inject constructor(
 
     init {
 
-       getSetDataForDate()
+            getSetDataForDate()
     }
-
-//    override suspend fun getUserByUid(uid: String): Resource<User?> {
-//        return try {
-//            val response = usersCollection.document(uid).get().await()
-//            if (response != null) {
-//                val user = response.toObject(User::class.java)
-//                return Resource.Success(data = user)
-//            } else Resource.Error("Error in login")
-//
-//        } catch (e: Exception) {
-//            Resource.Error("${e.message}")
-//        }
-//    }
-
-    /*Collection path: uid/date/date/exerciseName/exerciseName/setDoc*/
-//    suspend fun updateSetData() = try {
-//        val response = authRepositoryImpl.getCurrentUser()?.uid //Retrieving uid of current user
-//        if (response != null) {
-//            Log.d(TAG, response)
-//            //Creates or finds subcollection under exercise name
-//            db.collection(response)
-//                .document(dateIn.value.toString())
-//                .collection(dateIn.value.toString())
-//                .get()
-//                .addOnSuccessListener { exercises ->
-//                    //For each subcollection, all sets, in all logged exercise subcollections are collected
-//                    for (exercise in exercises) {
-//                        //getting specific set data
-//
-//                         db.collection(response)
-//                            .document(dateIn.value.toString())
-//                            .collection(dateIn.value.toString())
-//                            .document(exercise.get("name").toString())
-//                            .collection(exercise.get("name").toString()).get()
-//                            .addOnSuccessListener { sets ->
-//                                var setBundle: MutableList<AllExercises> by mutableStateOf(
-//                                    mutableListOf()
-//                                )
-//                                //Adding setData to list for UI
-//                                for (set in sets) {
-//                                    Log.d(TAG, "${set.data}")
-//                                    if(exercise.get("exType").toString() == "STATIC"){}
-//                                        setBundle.add(
-//                                            Statics(
-//                                                name = set.get("name") as String,
-//                                                holdTime = set.get("holdTime") as String,
-//                                                weight = set.get("weight") as String,
-//                                                sir = set.get("sir") as String,
-//                                                progression = set.get("progression") as String,
-//                                                setNumber = set.get("setNumber") as Long,
-//                                            )
-//                                        )
-//                                    if (set.get("exType").toString() == "DYNAMIC"){
-//                                        setBundle.add(
-//                                            Dynamics(
-//
-//                                            )
-//                                        )
-//                                    }
-//                                }
-//                                if (exerciseBundleMain.size == 1 && exerciseBundleMain.get(0)
-//                                        .get(0).name == setBundle.get(0).name
-//                                ) {
-//                                    exerciseBundleMain.set(0, setBundle)
-//                                } else {
-//                                    exerciseBundleMain.add(setBundle)
-//                                }
-//
-//                            }.addOnFailureListener {
-//                                throw Exception("Data fetch failed on get documents in subcol")
-//                            }
-//
-//                    }
-//                }.addOnFailureListener {
-//                    throw Exception("Data fetch failed on get exercise subcol")
-//                }
-//            Resource.Success("Data updated successfully")
-//        } else {
-//            Resource.Error("Error fetching uid")
-//        }
-//    } catch (e: Exception) {
-//        Resource.Error("Error updating data")
-//    }
 
 
     fun getSetDataForDate() {
         viewModelScope.launch { ->
-            val fetchData:Resource<MutableList<MutableList<AllExercises>>>
-            val exerciseBundleTemp:MutableList<MutableList<AllExercises>> = mutableListOf()
-
             //get logged in users UID
             val response = authRepositoryImpl.getCurrentUser()?.uid
             if(response != null){
                 //Call set updater to refresh list of logged exercises
-                fetchData = usersRepositoryImpl.setUpdater(date = dateIn.value.toString(), userUid = response, exerciseBundle = exerciseBundleTemp)
-
+                val updateLog = updateViewModel.updateViewLogUseCase(date = dateIn.value.toString(), userUid = response)
                 //Success
-                if(fetchData is Resource.Success && fetchData.data.size > 0){
-                    Log.d(TAG, "Size of bundle in VM ${exerciseBundleMain.size}")
-                    exerciseBundleMain.addAll(fetchData.data)
-                    Log.d(TAG, "Size of bundle ${exerciseBundleMain.size}")
-                }
-
-                dayScreenState.value = when (fetchData) {
-                    is Resource.Success-> DayViewModel.DayScreenState.LOADED
-                    is Resource.Error -> DayViewModel.DayScreenState.LAUNCH
+                Log.d(TAG, "${updateLog.message} WHAT THE FUCK BRO")
+                when(updateLog){
+                    is Resource.Success -> {
+                        exerciseBundleMain.clear()
+                        exerciseBundleMain.addAll(updateLog.data)
+                        Log.d(TAG, exerciseBundleMain[0][0].properties.toString())
+                        dayScreenState.value = DayScreenState.LOADED
+                    }
+                    is Resource.Error -> {
+                        if(updateLog.message == "empty-day"){
+                            Log.d(TAG, "${updateLog.message} HELLO")
+                            dayScreenState.value = DayScreenState.EMPTY
+                        }
+                        else{
+                            Log.d("BRUH", "${updateLog.message} WHuh")
+                            dayScreenState.value = DayScreenState.ERROR
+                        }
+                    }
                 }
             }
-//            _dayScreenState.value = DayScreenState.LOADED
         }
-
     }
 
     fun addNewSet(movement: AllExercises){
         viewModelScope.launch {
-            addSet(movement = movement)
+           addSet(movement = movement)
         }
     }
+
+
     suspend fun addSet(
         movement: AllExercises
     ) = try {
@@ -217,7 +144,7 @@ class DayViewModel @Inject constructor(
                 .document(movement.name).collection(movement.name).add(movement)
                 .addOnSuccessListener { documentReference ->
                     Log.d(
-                        TAG,
+                        ContentValues.TAG,
                         "DocumentSnapshot added with ID: ${documentReference.id} and curdate is ${date}"
                     )
                     getSetDataForDate()
@@ -227,6 +154,8 @@ class DayViewModel @Inject constructor(
     } catch (e: Exception) {
         Resource.Error("${e.message}")
     }
+
+
 
     fun filterTypeList() {
         val fBundle = _exerciseBundleMain

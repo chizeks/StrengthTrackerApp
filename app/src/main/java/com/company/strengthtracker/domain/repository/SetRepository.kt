@@ -10,8 +10,17 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.lang.Exception
 import java.time.LocalDate
 
 interface SetRepository {
+    suspend fun setUpdater(
+        exerciseBundle:MutableList<MutableList<AllExercises>>,
+        date: String,
+        userUid: String
+    ):Resource<MutableList<MutableList<AllExercises>>>
+
+
+    suspend fun addSet(movement:AllExercises):Resource<String>
 
 }
