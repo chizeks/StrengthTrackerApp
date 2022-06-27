@@ -23,68 +23,6 @@ class UsersRepositoryImpl @Inject constructor(
     private val db: FirebaseFirestore = Firebase.firestore
 ) : UsersRepository {
 
-    override suspend fun setUpdater(
-        exerciseBundle: MutableList<MutableList<AllExercises>>,
-        date: String,
-        userUid: String
-    ): Resource<MutableList<MutableList<AllExercises>>> {
-        //Creates or finds subcollection under exercise name
-        val setBundle: MutableList<AllExercises> = mutableListOf()
-        val allExercisesRef = db.collection(userUid)
-            .document(date)
-            .collection(date).get().await()
-        allExercisesRef?.documents?.forEach { exercise ->
-            if (exercise != null) {
-                val exName = exercise.get("name").toString()
-                val exType = exercise.get("exType").toString()
-                val setRef = db.collection(userUid)
-                    .document(date)
-                    .collection(date)
-                    .document(exName)
-                    .collection(exName).get().await()
-
-                setRef?.documents?.forEach { set ->
-                    if (set != null) {
-                        if (exType == "STATIC") {
-                            setBundle.add(
-                                Statics(
-                                    name = set.get("name") as String,
-                                    holdTime = set.get("holdTime") as String,
-                                    weight = set.get("weight") as String,
-                                    sir = set.get("sir") as String,
-                                    progression = set.get("progression") as String,
-                                    setNumber = set.get("setNumber") as Long,
-                                    iconId = -1
-                                )
-                            )
-                            Log.d(TAG, "ADDING STATIC SET")
-                        }
-                        if (exType == "DYNAMIC") {
-                            setBundle.add(
-                                Dynamics(
-                                    name = set.get("name") as String,
-                                    weight = set.get("weight") as String,
-                                    reps = set.get("reps") as String,
-                                    rir = set.get("rir") as String,
-                                    setNumber = set.get("setNumber") as Long,
-                                    iconId = -1
-                                )
-                            )
-                            Log.d(TAG, "ADDING DYNAMIC SET")
-                        }
-                    }
-                }
-                if (exerciseBundle.size == 1 && exerciseBundle[0][0].name == setBundle[0].name
-                ) {
-                    exerciseBundle[0] = setBundle
-                } else {
-                    exerciseBundle.add(setBundle)
-                }
-            }
-        }
-        return Resource.Success(exerciseBundle)
-    }
-
     override suspend fun getUserByUid(uid: String): Resource<User?> {
         return try {
             val response = usersCollection.document(uid).get().await()
