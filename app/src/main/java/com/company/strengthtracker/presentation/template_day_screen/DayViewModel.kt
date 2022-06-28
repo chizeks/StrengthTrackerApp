@@ -6,9 +6,12 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.company.strengthtracker.data.entities.User
+import com.company.strengthtracker.data.entities.exercise_data.exercise_definitions.FrontLever
+import com.company.strengthtracker.data.entities.exercise_data.exercise_definitions.Planche
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.*
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
 import com.company.strengthtracker.data.repository.SetRepositoryImpl
@@ -61,6 +64,11 @@ class DayViewModel @Inject constructor(
     //visible set list
     val exerciseBundleMain = _exerciseBundleMain
 
+    val bundleTest:SnapshotStateList<MutableList<AllExercises>> = mutableStateListOf(
+        mutableListOf(Planche(holdTime = "5", weight = "5")), mutableListOf(FrontLever(holdTime = "3", weight = "3"))
+    )
+
+
     private val _exList = mutableStateListOf<AllExercises>()
     val exList = _exList
 
@@ -73,7 +81,6 @@ class DayViewModel @Inject constructor(
     fun updateDate(newValue: LocalDate) {
         dayScreenState.value = DayScreenState.LOADING
         _dateIn.value = newValue
-        exerciseBundleMain.clear()
         getSetDataForDate()
     }
 
@@ -89,27 +96,24 @@ class DayViewModel @Inject constructor(
 
     fun getSetDataForDate() {
         viewModelScope.launch { ->
-            //get logged in users UID
+            //get logged in users UI
             val response = authRepositoryImpl.getCurrentUser()?.uid
             if(response != null){
                 //Call set updater to refresh list of logged exercises
-                val updateLog = updateViewModel.updateViewLogUseCase(date = dateIn.value.toString(), userUid = response)
-                //Success
-                Log.d(TAG, "${updateLog.message} WHAT THE FUCK BRO")
+                //val updateLog = updateViewModel.updateViewLogUseCase(date = dateIn.value.toString(), userUid = response)
+                val updateLog = updateViewModel.updateViewLog(date = dateIn.value.toString(), userUid = response)
+                    //Success
                 when(updateLog){
                     is Resource.Success -> {
                         exerciseBundleMain.clear()
                         exerciseBundleMain.addAll(updateLog.data)
-                        Log.d(TAG, exerciseBundleMain[0][0].properties.toString())
                         dayScreenState.value = DayScreenState.LOADED
                     }
                     is Resource.Error -> {
                         if(updateLog.message == "empty-day"){
-                            Log.d(TAG, "${updateLog.message} HELLO")
                             dayScreenState.value = DayScreenState.EMPTY
                         }
                         else{
-                            Log.d("BRUH", "${updateLog.message} WHuh")
                             dayScreenState.value = DayScreenState.ERROR
                         }
                     }
@@ -118,9 +122,11 @@ class DayViewModel @Inject constructor(
         }
     }
 
+
+
     fun addNewSet(movement: AllExercises){
         viewModelScope.launch {
-           addSet(movement = movement)
+          // addSet(movement = movement)
         }
     }
 

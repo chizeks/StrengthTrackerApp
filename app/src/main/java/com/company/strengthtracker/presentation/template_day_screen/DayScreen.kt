@@ -17,9 +17,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -123,6 +125,10 @@ fun DayScreen(
 
 
                 }
+                Column(modifier = Modifier.background(Color.Transparent).fillMaxSize(), verticalArrangement = Arrangement.Bottom){
+                    BottomBar(viewModel = viewModel, date = date, colors = colors)
+                }
+
             }
             DayViewModel.DayScreenState.SELECT -> {
                 //viewModel.filterTypeList()
