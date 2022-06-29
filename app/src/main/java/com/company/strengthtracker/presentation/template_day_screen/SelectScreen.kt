@@ -26,7 +26,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
 
-/*Generic popup for adding an exercise*/
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenericAddPopUp(
