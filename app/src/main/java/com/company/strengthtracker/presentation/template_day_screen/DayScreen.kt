@@ -72,22 +72,23 @@ fun DayScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) { //fades in/out child element
+        TopBar(viewModel = viewModel, date = date, colors)
         when (screenState) {
             LAUNCH -> {
-                TopBar(viewModel = viewModel, date = date, colors)
+                //TopBar(viewModel = viewModel, date = date, colors)
 
             }
             LOADING -> {
-                Text(text = "Loading")
+
             }
             ERROR -> {
-                TopBar(viewModel = viewModel, date = date, colors)
+                Text("Error")
                 scope.launch {
                     snackbarHostState.showSnackbar("There was an error retrieving log data for this day")
                 }
             }
             EMPTY -> {
-                TopBar(viewModel = viewModel, date = date, colors)
+                //TopBar(viewModel = viewModel, date = date, colors)
                 Column(
                     modifier = Modifier.fillMaxHeight(0.9f),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -103,9 +104,7 @@ fun DayScreen(
                 BottomBar(viewModel = viewModel, date = date, colors = colors)
             }
             LOADED -> {
-                Log.d(TAG, "ExBundle SIZE ---> " + exerciseBundle.size.toString() + " NAME " + exerciseBundle[0][0].name)
-
-                TopBar(viewModel = viewModel, date = date, colors)
+               // TopBar(viewModel = viewModel, date = date, colors)
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),

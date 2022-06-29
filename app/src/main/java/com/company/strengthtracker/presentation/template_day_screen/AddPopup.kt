@@ -130,8 +130,8 @@ fun StaticsAddSetPopUp(
                             onClick = {
 
                                 /*PASS DATA TO VIEWMODEL, IMMEDIATELY MAKE NEW DOCUMENT*/
-                                viewModel.addNewSet(
-                                    movement
+                                viewModel.addSetHelp(
+                                    movement = movement
                                 )
                                 openDialog = false
 

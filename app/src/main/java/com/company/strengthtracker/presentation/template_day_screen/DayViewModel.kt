@@ -16,6 +16,7 @@ import com.company.strengthtracker.data.entities.exercise_data.main_categories.*
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
 import com.company.strengthtracker.data.repository.SetRepositoryImpl
 import com.company.strengthtracker.data.repository.UsersRepositoryImpl
+import com.company.strengthtracker.domain.use_cases.AddSetToLogUseCase
 import com.company.strengthtracker.domain.use_cases.UpdateViewmodelLogUseCase
 import com.company.strengthtracker.domain.util.Resource
 import com.company.strengthtracker.presentation.register_screen.RegisterViewModel
@@ -36,6 +37,7 @@ class DayViewModel @Inject constructor(
     private val authRepositoryImpl: AuthRepositoryImpl,
     private val setRepositoryImpl: SetRepositoryImpl,
     private val updateViewModel: UpdateViewmodelLogUseCase,
+    private val addSetUseCase: AddSetToLogUseCase
 ) : ViewModel() {
     // registerScreenState.value = RegisterScreenState.LOADING
 
@@ -64,8 +66,9 @@ class DayViewModel @Inject constructor(
     //visible set list
     val exerciseBundleMain = _exerciseBundleMain
 
-    val bundleTest:SnapshotStateList<MutableList<AllExercises>> = mutableStateListOf(
-        mutableListOf(Planche(holdTime = "5", weight = "5")), mutableListOf(FrontLever(holdTime = "3", weight = "3"))
+    val bundleTest: SnapshotStateList<MutableList<AllExercises>> = mutableStateListOf(
+        mutableListOf(Planche(holdTime = "5", weight = "5")),
+        mutableListOf(FrontLever(holdTime = "3", weight = "3"))
     )
 
 
@@ -79,41 +82,48 @@ class DayViewModel @Inject constructor(
     var date = mutableStateOf(formatter.format(dateIn.value))
 
     fun updateDate(newValue: LocalDate) {
-        dayScreenState.value = DayScreenState.LOADING
+        //dayScreenState.value = DayScreenState.LOADING
         _dateIn.value = newValue
         getSetDataForDate()
     }
 
-    fun openSelection() { _dayScreenState.value = DayScreenState.SELECT }
+    fun openSelection() {
+        _dayScreenState.value = DayScreenState.SELECT
+    }
 
-    fun closeSelection() { _dayScreenState.value = DayScreenState.LOADED }
+    fun closeSelection() {
+        _dayScreenState.value = DayScreenState.LOADED
+    }
 
     init {
 
-            getSetDataForDate()
+        getSetDataForDate()
     }
 
 
-    fun getSetDataForDate() {
+    private fun getSetDataForDate() {
         viewModelScope.launch { ->
             //get logged in users UI
             val response = authRepositoryImpl.getCurrentUser()?.uid
-            if(response != null){
+            if (response != null) {
                 //Call set updater to refresh list of logged exercises
                 //val updateLog = updateViewModel.updateViewLogUseCase(date = dateIn.value.toString(), userUid = response)
-                val updateLog = updateViewModel.updateViewLog(date = dateIn.value.toString(), userUid = response)
-                    //Success
-                when(updateLog){
+                val updateLog = updateViewModel.updateViewLog(
+                    date = dateIn.value.toString(),
+                    userUid = response
+                )
+                //Success
+                when (updateLog) {
                     is Resource.Success -> {
                         exerciseBundleMain.clear()
                         exerciseBundleMain.addAll(updateLog.data)
+                        Log.d(TAG, exerciseBundleMain.size.toString())
                         dayScreenState.value = DayScreenState.LOADED
                     }
                     is Resource.Error -> {
-                        if(updateLog.message == "empty-day"){
+                        if (updateLog.message == "empty-day") {
                             dayScreenState.value = DayScreenState.EMPTY
-                        }
-                        else{
+                        } else {
                             dayScreenState.value = DayScreenState.ERROR
                         }
                     }
@@ -122,71 +132,28 @@ class DayViewModel @Inject constructor(
         }
     }
 
-
-
-    fun addNewSet(movement: AllExercises){
-        viewModelScope.launch {
-          // addSet(movement = movement)
-        }
-    }
-
-
-    suspend fun addSet(
-        movement: AllExercises
-    ) = try {
-        val docData = hashMapOf(
-            "name" to movement.name,
-            "exType" to movement.exType
-        )
-
-        val response = authRepositoryImpl.getCurrentUser()?.uid
-
-        if (response != null) {
-            val docref = db.collection(response).document(dateIn.value.toString())
-                .collection(dateIn.value.toString()).document(movement.name).set(docData)
-
-            db.collection(response).document(dateIn.value.toString())
-                .collection(dateIn.value.toString())
-                .document(movement.name).collection(movement.name).add(movement)
-                .addOnSuccessListener { documentReference ->
-                    Log.d(
-                        ContentValues.TAG,
-                        "DocumentSnapshot added with ID: ${documentReference.id} and curdate is ${date}"
-                    )
-                    getSetDataForDate()
-                }
-            Resource.Success("Set logged")
-        } else Resource.Error("Error has occurred logging set")
-    } catch (e: Exception) {
-        Resource.Error("${e.message}")
-    }
-
-
-
-    fun filterTypeList() {
-        val fBundle = _exerciseBundleMain
-        var tempTypeList = _exerciseTypes.value
-
-        val indexList: MutableList<AllExercises> = mutableListOf()
-        Log.d(TAG, "Bruh---->" + tempTypeList.size.toString())
-        if (fBundle.size > 0) {
-            for (i in 0..fBundle.size - 1) {
-                var tempType = fBundle.get(i).get(0)
-                Log.d(TAG, "Check tempType" + tempType.name)
-                for (j in 0..tempTypeList.size - 1) {
-                    Log.d(TAG, "check--->" + tempTypeList.get(j).name)
-                    if (tempType.name == tempTypeList.get(j).name) {
-                        //tempTypeList.removeAt(j)
-                        indexList.add(tempTypeList.get(j))
+    fun addSetHelp(movement: AllExercises,
+    ) {
+        viewModelScope.launch{
+            val response = authRepositoryImpl.getCurrentUser()
+            if(response != null) {
+                when(addSetUseCase.addSet(movement, dateIn.value.toString(), response.uid)) {
+                    is Resource.Success -> {
+                        getSetDataForDate()
+                    }
+                    is Resource.Error -> {
+                        //TODO: change this at some point to be actually good
+                        dayScreenState.value = DayScreenState.ERROR
                     }
                 }
             }
-            indexList.forEach { it ->
-                tempTypeList.remove(it)
+            else {
+
             }
+
         }
-
     }
-
 }
+
+
 

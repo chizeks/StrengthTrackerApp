@@ -26,26 +26,30 @@ import java.lang.Exception
 import java.nio.file.Path
 import java.time.LocalDate
 import javax.inject.Inject
+
 //
 class SetRepositoryImpl @Inject constructor(
-    private val db:FirebaseFirestore
+    private val db: FirebaseFirestore
 ) : SetRepository {
 
-    override suspend fun setUpdaterNewVersion(
+    override suspend fun getAllExerciseSubcollection(
         date: String,
         userUid: String
     ): Resource<QuerySnapshot> {
-        //reference to collection of exercises logged by the user on a specified date
-        val allExercisesRef = db.collection(userUid)
-            .document(date)
-            .collection(date).get().await()
-        return if(allExercisesRef.documents.size > 0)
-            Resource.Success(allExercisesRef)
-        else if (allExercisesRef.documents.size == 0){
-            Resource.Error("empty-day")
+        return try {
+            //reference to collection of exercises logged by the user on a specified date
+            val allExercisesRef = db.collection(userUid)
+                .document(date)
+                .collection(date).get().await()
+            if (!allExercisesRef.isEmpty)
+                Resource.Success(allExercisesRef)
+            else if (allExercisesRef.isEmpty) {
+                Resource.Error("empty-day")
+            } else
+                Resource.Error("Error retrieving collection for this date")
+        } catch(e:Exception){
+           return Resource.Error("exception thrown ")
         }
-        else
-            Resource.Error("Error retrieving collection for this date")
     }
 
     override suspend fun getSetSubcollection(
@@ -53,35 +57,50 @@ class SetRepositoryImpl @Inject constructor(
         userUid: String,
         exName: String
     ): Resource<QuerySnapshot> {
-        val setsRef = db.collection(userUid).document(date).collection(date).document(exName).collection(exName).get().await()
-        return if(setsRef.documents.size > 0)
-            Resource.Success(setsRef)
-        else Resource.Error("Error retrieving sets for this exercise")
+        return try {
+            val setsRef = db.collection(userUid).document(date).collection(date).document(exName)
+                .collection(exName).get().await()
+
+            if (setsRef.isEmpty)
+                Resource.Error("Error retrieving sets for this exercise")
+            else
+                Resource.Success(setsRef)
+        } catch (e: Exception) {
+           return Resource.Error("Exception thrown")
+        }
+    }
+
+    override suspend fun createLogPath(
+        fields: HashMap<String, String>,
+        userUid: String,
+        date: String,
+        name: String,
+        exType: String
+    ): Resource<String> {
+        return try {
+            db.collection(userUid).document(date).collection(date).document(name).set(fields)
+                .await()
+            Resource.Success("path created")
+        } catch (e: Exception) {
+           return Resource.Error("Error creating correct path for logging")
+        }
     }
 
     override suspend fun addSet(
-        movement: AllExercises,
-        date:String,
-        userUid:String
-    ):Resource<String> {
-//        val docData = hashMapOf(
-//            "name" to movement.name,
-//            "exType" to movement.exType
-//        )
-//
-//        //adds fields to the subcollection for each individual exercise for further organization
-//        val pathFieldCreator = db.collection(userUid).document(date)
-//            .collection(date).document(movement.name).set(docData)
-//
-//        val newDoc = db.collection(userUid).document(date)
-//            .collection(date)
-//            .document(movement.name).collection(movement.name).add(movement).addOnCompleteListener {task ->
-//                if(task.isSuccessful){
-//                    return@addOnCompleteListener Resource.Success(task.result.id.toString())
-//                }
-//
-//            }
-        return Resource.Success("bruh")
+        movement:AllExercises,
+        date: String,
+        userUid: String
+    ): Resource<String> {
+        return try{
+            val newDoc = db.collection(userUid).document(date).collection(date).document(movement.name).collection(movement.name).add(movement).await()
+            if(newDoc != null){
+                Log.d(TAG, "Successful add, throwing success back to use case")
+                Resource.Success("Successful add")
+            } else
+                Resource.Error("Failed add")
+        } catch(e:Exception){
+           return Resource.Error("exception when adding to database")
+        }
     }
 
 

@@ -17,20 +17,26 @@ import java.lang.Exception
 import java.time.LocalDate
 
 interface SetRepository {
-//    suspend fun setUpdater(
+    //    suspend fun setUpdater(
 //        exerciseBundle:MutableList<MutableList<AllExercises>>,
 //        date: String,
 //        userUid: String
 //    ):Resource<MutableList<MutableList<AllExercises>>>
-
+    suspend fun createLogPath(
+        fields: HashMap<String, String>,
+        userUid: String,
+        date: String,
+        name: String,
+        exType: String
+    ): Resource<String>
 
     suspend fun addSet(
-        movement:AllExercises,
-        date:String,
-        userUid:String
-    ):Resource<String>
+        movement: AllExercises,
+        date: String,
+        userUid: String
+    ): Resource<String>
 
-    suspend fun setUpdaterNewVersion(
+    suspend fun getAllExerciseSubcollection(
         date: String,
         userUid: String
     ): Resource<QuerySnapshot>

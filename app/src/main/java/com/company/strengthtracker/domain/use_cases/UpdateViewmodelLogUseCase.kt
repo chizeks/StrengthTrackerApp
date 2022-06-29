@@ -30,7 +30,7 @@ class UpdateViewmodelLogUseCase @Inject constructor(
     ):Resource<MutableList<MutableList<AllExercises>>>{
         val bundle:MutableList<MutableList<AllExercises>> = mutableListOf()
 
-        val response = setRepositoryImpl.setUpdaterNewVersion(date = date, userUid = userUid)
+        val response = setRepositoryImpl.getAllExerciseSubcollection(date = date, userUid = userUid)
         when(response) {
             is Resource.Success -> {
                 response.data.documents.forEach { exerciseCategory ->
@@ -41,11 +41,11 @@ class UpdateViewmodelLogUseCase @Inject constructor(
                     )
                     when(setsRef) {
                         is Resource.Success -> {
-                            setsRef.data.documents.forEach {
+                            //setsRef.data.documents.forEach {
+
                                 val collect = collectDataFromLog(
                                     setsRef = setsRef.data,
-                                    exType = exerciseCategory.get("exType").toString())
-
+                                    exType = exerciseCategory.get("exType").toString(), setBundle = mutableListOf())
 
                                 when(collect){
                                     is Resource.Success -> {
@@ -55,7 +55,7 @@ class UpdateViewmodelLogUseCase @Inject constructor(
                                         return Resource.Error(message = collect.message)
                                     }
                                 }
-                            }
+                            //}
                         }
                         is Resource.Error -> {
                             return Resource.Error(setsRef.message)
@@ -70,8 +70,8 @@ class UpdateViewmodelLogUseCase @Inject constructor(
         return Resource.Success(bundle)
     }
 
-    suspend fun collectDataFromLog(
-        setBundle:MutableList<AllExercises> = mutableListOf(),
+    private suspend fun collectDataFromLog(
+        setBundle:MutableList<AllExercises>,
         setsRef: QuerySnapshot,
         exType:String,
     ): Resource<MutableList<AllExercises>> {
