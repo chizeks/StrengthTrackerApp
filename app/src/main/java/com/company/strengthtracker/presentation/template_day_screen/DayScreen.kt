@@ -72,7 +72,10 @@ fun DayScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) { //fades in/out child element
-        TopBar(viewModel = viewModel, date = date, colors)
+        TopBar(updateDate = {viewModel.updateDate(it)}, date = date, colors = colors)
+        Button(onClick = { /*TODO*/ }) {
+            
+        }
         when (screenState) {
             LAUNCH -> {
                 //TopBar(viewModel = viewModel, date = date, colors)
@@ -102,7 +105,7 @@ fun DayScreen(
                     )
 
                 }
-                BottomBar(viewModel = viewModel, date = date, colors = colors)
+                BottomBar(date = date, colors = colors, onOpenSelection = {viewModel.openSelection()})
             }
             LOADED -> {
                 // TopBar(viewModel = viewModel, date = date, colors)
@@ -118,7 +121,8 @@ fun DayScreen(
                         ExpandableExerciseCard(
                             movement = element.get(0),
                             date = date.value,
-                            exercises = exerciseBundle.get(index)
+                            exercises = exerciseBundle.get(index),
+                            addSetHelp = {viewModel.addSetHelp(it)}
                         )
 
                     }
@@ -131,13 +135,13 @@ fun DayScreen(
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.Bottom
                 ) {
-                    BottomBar(viewModel = viewModel, date = date, colors = colors)
+                    BottomBar(date = date, colors = colors, onOpenSelection = {viewModel.openSelection()})
                 }
 
             }
             DayViewModel.DayScreenState.SELECT -> {
                 //viewModel.filterTypeList()
-                SelectionColumn(exerciseList = typeList.value, viewModel = viewModel)
+                SelectionColumn(exerciseList = typeList.value, updateViewModel = {viewModel.updateBundle(it)}, closeSelection = {viewModel.closeSelection()})
                 //Divider(modifier = Modifier.fillMaxWidth(1f))
             }
 
@@ -148,9 +152,9 @@ fun DayScreen(
 
 @Composable
 fun BottomBar(
-    viewModel: DayViewModel,
     date: MutableState<LocalDate>,
     colors: ColorScheme,
+    onOpenSelection: () -> Unit
 ) {
 
     Row(
@@ -159,7 +163,7 @@ fun BottomBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         FloatingActionButton(
-            onClick = { viewModel.openSelection() },
+            onClick = onOpenSelection,
             containerColor = colors.primaryContainer,
             contentColor = colors.onPrimaryContainer
         ) {
@@ -176,7 +180,7 @@ fun BottomBar(
 
 @Composable
 fun TopBar(
-    viewModel: DayViewModel,
+    updateDate: (LocalDate) -> Unit,
     date: MutableState<LocalDate>,
     colors: ColorScheme
 ) {
@@ -184,9 +188,9 @@ fun TopBar(
     val formatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
     AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
 
-        ExpandCalendar(updateDay = {
+        ExpandCalendar(updateDay = { it ->
             //date lambda
-            viewModel.updateDate(it) //updating vm
+            updateDate(it)
         })
     }
 

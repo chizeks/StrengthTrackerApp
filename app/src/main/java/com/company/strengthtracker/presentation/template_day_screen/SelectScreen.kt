@@ -32,8 +32,8 @@ import com.company.strengthtracker.data.entities.exercise_data.main_categories.A
 @Composable
 fun GenericAddPopUp(
     movement: AllExercises,
-    viewModel: DayViewModel = hiltViewModel(),
-    content: @Composable() () -> Unit
+    updateViewModel: (MutableList<AllExercises>) -> Unit,
+    closeSelection: () -> Unit,
 ) {
     //controller boolean for state of pop up
     var openDialog by remember { mutableStateOf(true) }
@@ -114,7 +114,9 @@ fun GenericAddPopUp(
 
                             onClick = {
                                 //add action here
-                                viewModel.exerciseBundleMain.add(mutableListOf(movement))
+//                                viewModel.exerciseBundleMain.add(mutableListOf(movement))
+                                updateViewModel(mutableListOf(movement))
+                                closeSelection()
                                 openDialog = false
                             },
                             elevation = ButtonDefaults.buttonElevation(0.dp),
@@ -152,7 +154,8 @@ fun GenericAddPopUp(
 @Composable
 fun SelectionColumn(
     exerciseList: List<AllExercises>,
-    viewModel: DayViewModel
+    updateViewModel: (MutableList<AllExercises>) -> Unit,
+    closeSelection: ()-> Unit,
 ) {
 
     Scaffold(topBar = {
@@ -163,7 +166,7 @@ fun SelectionColumn(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            IconButton(onClick = { viewModel.closeSelection() })
+            IconButton(onClick = {})
             {
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "backToDayView")
             }
@@ -188,7 +191,7 @@ fun SelectionColumn(
             )
             exerciseList.forEach {
                 it
-                SelectionCard(movement = it, viewModel = viewModel, "selectionItem")
+                SelectionCard(movement = it, "selectionItem", updateViewModel = updateViewModel, closeSelection = closeSelection)
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth(1f)
@@ -204,8 +207,9 @@ fun SelectionColumn(
 @Composable
 fun SelectionCard(
     movement: AllExercises,
-    viewModel: DayViewModel,
     contentDescription: String,
+    updateViewModel: (MutableList<AllExercises>) -> Unit,
+    closeSelection: () -> Unit
 ) {
     var dialog by remember { mutableStateOf(false) }
     Column(
@@ -271,9 +275,7 @@ fun SelectionCard(
         }
         //Divider(modifier = Modifier.fillMaxWidth(1f))
         if (dialog) {
-            GenericAddPopUp(movement = movement) {
-                TextField(value = "bruh", onValueChange = {})
-            }
+            GenericAddPopUp(movement = movement, updateViewModel = {updateViewModel(it)}, closeSelection = {closeSelection()})
         }
 
     }

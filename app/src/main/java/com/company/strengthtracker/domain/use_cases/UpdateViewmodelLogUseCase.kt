@@ -58,6 +58,7 @@ class UpdateViewmodelLogUseCase @Inject constructor(
         return Resource.Success(bundle)
     }
 
+
     private suspend fun collectDataFromLog(
         setBundle:MutableList<AllExercises>,
         setsRef: QuerySnapshot,

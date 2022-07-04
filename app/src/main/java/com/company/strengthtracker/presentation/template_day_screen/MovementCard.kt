@@ -26,6 +26,7 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpandableExerciseCard(
+    addSetHelp: (AllExercises) -> Unit,
     movement: AllExercises,
     titleFontSize: TextUnit = MaterialTheme.typography.titleMedium.fontSize,
     titleFontWeight: FontWeight = FontWeight.Bold,
@@ -148,7 +149,8 @@ fun ExpandableExerciseCard(
                     StaticsAddSetPopUp(
                         movement = movement,
                         date = date,
-                        setsSoFar = setsSoFar
+                        setsSoFar = setsSoFar,
+                        addSetHelp = addSetHelp,
                     )
                     //StaticsTextFields(movement = movement)
                 } else if (movement is Dynamics) {

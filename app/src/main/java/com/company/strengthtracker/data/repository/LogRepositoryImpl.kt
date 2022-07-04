@@ -67,14 +67,13 @@ class LogRepositoryImpl @Inject constructor(
 
             val query =  db.collection(userUid).whereGreaterThan("date", dateStart).whereLessThan("date", dateEnd).get().await()
             if(!query.isEmpty){
-
+Log.d(TAG, "${query.documents.size}")
                 Resource.Success(query)
             } else (Resource.Error("range fetch was empty"))
         } catch (e:Exception) {
            Resource.Error("Exception while fetching range")
         }
     }
-
     override suspend fun createLogPath(
         fields: HashMap<String, String>,
         dateIndex: HashMap<String,LocalDate>,
