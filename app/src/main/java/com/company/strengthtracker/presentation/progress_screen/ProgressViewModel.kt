@@ -1,17 +1,16 @@
 package com.company.strengthtracker.presentation.progress_screen
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import com.company.strengthtracker.data.repository.LogRepositoryImpl
+import com.company.strengthtracker.data.repository.SetRepositoryImpl
 import java.time.LocalDate
 import javax.inject.Inject
 
 class ProgressViewModel @Inject constructor(
-private val logRepository: LogRepositoryImpl
+private val logRepository: SetRepositoryImpl
 
 ) : ViewModel() {
     val input = mutableMapOf(

@@ -3,10 +3,8 @@ package com.company.strengthtracker.data.repository
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
-import com.company.strengthtracker.di.AppModule
-import com.company.strengthtracker.domain.repository.LogRepository
+import com.company.strengthtracker.domain.repository.SetRepository
 import com.company.strengthtracker.domain.util.Resource
-import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.tasks.await
@@ -15,9 +13,9 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 //
-class LogRepositoryImpl @Inject constructor(
+class SetRepositoryImpl @Inject constructor(
     private val db: FirebaseFirestore,
-) : LogRepository {
+) : SetRepository {
 
     override suspend fun getAllExerciseSubcollection(
         date: String,

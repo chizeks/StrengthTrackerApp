@@ -5,7 +5,7 @@ import com.company.strengthtracker.domain.util.Resource
 import com.google.firebase.firestore.QuerySnapshot
 import java.time.LocalDate
 
-interface LogRepository {
+interface SetRepository {
     //    suspend fun setUpdater(
 //        exerciseBundle:MutableList<MutableList<AllExercises>>,
 //        date: String,

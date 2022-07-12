@@ -12,7 +12,7 @@ import com.company.strengthtracker.data.entities.exercise_data.exercise_definiti
 import com.company.strengthtracker.data.entities.exercise_data.exercise_definitions.Planche
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.*
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
-import com.company.strengthtracker.data.repository.LogRepositoryImpl
+import com.company.strengthtracker.data.repository.SetRepositoryImpl
 import com.company.strengthtracker.domain.use_cases.AddSetToLogUseCase
 import com.company.strengthtracker.domain.use_cases.UpdateViewmodelLogUseCase
 import com.company.strengthtracker.domain.util.Resource
@@ -29,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DayViewModel @Inject constructor(
     private val authRepositoryImpl: AuthRepositoryImpl,
-    private val logRepositoryImpl: LogRepositoryImpl,
+    private val logRepositoryImpl: SetRepositoryImpl,
     private val updateViewModel: UpdateViewmodelLogUseCase,
     private val addSetUseCase: AddSetToLogUseCase
 ) : ViewModel() {

@@ -4,13 +4,13 @@ package com.company.strengthtracker.domain.use_cases
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Dynamics
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
-import com.company.strengthtracker.domain.repository.LogRepository
+import com.company.strengthtracker.domain.repository.SetRepository
 import com.company.strengthtracker.domain.util.Resource
 import com.google.firebase.firestore.QuerySnapshot
 import javax.inject.Inject
 
 class UpdateViewmodelLogUseCase @Inject constructor(
-    private val setRepositoryImpl: LogRepository
+    private val setRepositoryImpl: SetRepository
 ) {
     suspend fun updateViewLog(
         date:String,
