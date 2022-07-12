@@ -25,6 +25,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.company.strengthtracker.data.entities.exercise_data.exercise_definitions.Progressions
+import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.Statics
 import java.time.LocalDate
 
@@ -34,7 +35,7 @@ import java.time.LocalDate
 @Composable
 fun StaticsAddSetPopUp(
     movement: Statics,
-    viewModel: DayViewModel = hiltViewModel(),
+    addSetHelp: (AllExercises) -> Unit,
     date: LocalDate,
     setsSoFar: Long
 
@@ -128,13 +129,8 @@ fun StaticsAddSetPopUp(
                         Button(
 
                             onClick = {
-
-                                /*PASS DATA TO VIEWMODEL, IMMEDIATELY MAKE NEW DOCUMENT*/
-                                viewModel.addSetHelp(
-                                    movement = movement
-                                )
+                                addSetHelp(movement)
                                 openDialog = false
-
                             },
                             elevation = ButtonDefaults.buttonElevation(0.dp),
                             colors = ButtonDefaults.buttonColors(

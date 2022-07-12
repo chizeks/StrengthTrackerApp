@@ -1,6 +1,5 @@
 package com.company.strengthtracker.presentation.template_day_screen
 
-import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.os.Build
 import android.util.Log
@@ -9,33 +8,28 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.company.strengthtracker.data.entities.User
 import com.company.strengthtracker.data.entities.exercise_data.exercise_definitions.FrontLever
 import com.company.strengthtracker.data.entities.exercise_data.exercise_definitions.Planche
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.*
 import com.company.strengthtracker.data.repository.AuthRepositoryImpl
-import com.company.strengthtracker.data.repository.SetRepositoryImpl
-import com.company.strengthtracker.data.repository.UsersRepositoryImpl
+import com.company.strengthtracker.data.repository.LogRepositoryImpl
 import com.company.strengthtracker.domain.use_cases.AddSetToLogUseCase
 import com.company.strengthtracker.domain.use_cases.UpdateViewmodelLogUseCase
 import com.company.strengthtracker.domain.util.Resource
-import com.company.strengthtracker.presentation.register_screen.RegisterViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.*
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class DayViewModel @Inject constructor(
     private val authRepositoryImpl: AuthRepositoryImpl,
-    private val setRepositoryImpl: SetRepositoryImpl,
+    private val logRepositoryImpl: LogRepositoryImpl,
     private val updateViewModel: UpdateViewmodelLogUseCase,
     private val addSetUseCase: AddSetToLogUseCase
 ) : ViewModel() {
@@ -82,25 +76,32 @@ class DayViewModel @Inject constructor(
     var date = mutableStateOf(formatter.format(dateIn.value))
 
     fun updateDate(newValue: LocalDate) {
+        dayScreenState.value = DayScreenState.LAUNCH
+        exerciseBundleMain.clear()
         //dayScreenState.value = DayScreenState.LOADING
-        _dateIn.value = newValue
+        dateIn.value = newValue
+        Log.d(TAG, "date value ----> " + _dateIn.value.toString())
         getSetDataForDate()
     }
 
     fun openSelection() {
-        _dayScreenState.value = DayScreenState.SELECT
+        dayScreenState.value = DayScreenState.SELECT
+        Log.d(TAG, "SCREENSTATE IS ----> ${_dayScreenState.value}")
     }
 
     fun closeSelection() {
-        _dayScreenState.value = DayScreenState.LOADED
+        dayScreenState.value = DayScreenState.LOADED
+        Log.d(TAG, "SCREENSTATE IS-----> ${_dayScreenState.value}")
     }
 
     init {
-
         getSetDataForDate()
     }
 
 
+    fun updateBundle(list:MutableList<AllExercises>) {
+        exerciseBundleMain.add(list)
+    }
     private fun getSetDataForDate() {
         viewModelScope.launch { ->
             //get logged in users UI
@@ -115,9 +116,9 @@ class DayViewModel @Inject constructor(
                 //Success
                 when (updateLog) {
                     is Resource.Success -> {
-                        exerciseBundleMain.clear()
+//                        exerciseBundleMain.clear()
                         exerciseBundleMain.addAll(updateLog.data)
-                        Log.d(TAG, exerciseBundleMain.size.toString())
+                        Log.d(TAG, "new bundle size ----> " + exerciseBundleMain.size.toString())
                         dayScreenState.value = DayScreenState.LOADED
                     }
                     is Resource.Error -> {
@@ -131,13 +132,19 @@ class DayViewModel @Inject constructor(
             }
         }
     }
+//    fun testfunction() {
+//        viewmodelscope.launch {
+//            logrepositoryimpl.gethistory(localdate.of())
+//        }
+//
+//    }
 
     fun addSetHelp(movement: AllExercises,
     ) {
         viewModelScope.launch{
             val response = authRepositoryImpl.getCurrentUser()
             if(response != null) {
-                when(addSetUseCase.addSet(movement, dateIn.value.toString(), response.uid)) {
+                when(addSetUseCase.addSet(movement, dateIn.value, response.uid)) {
                     is Resource.Success -> {
                         getSetDataForDate()
                     }

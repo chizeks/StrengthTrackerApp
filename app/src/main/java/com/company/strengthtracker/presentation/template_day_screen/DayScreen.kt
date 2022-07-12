@@ -72,13 +72,17 @@ fun DayScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) { //fades in/out child element
-        TopBar(viewModel = viewModel, date = date, colors)
+        TopBar(updateDate = {viewModel.updateDate(it)}, date = date, colors = colors)
+        Button(onClick = { /*TODO*/ }) {
+            
+        }
         when (screenState) {
             LAUNCH -> {
                 //TopBar(viewModel = viewModel, date = date, colors)
 
             }
             LOADING -> {
+
 
             }
             ERROR -> {
@@ -101,10 +105,10 @@ fun DayScreen(
                     )
 
                 }
-                BottomBar(viewModel = viewModel, date = date, colors = colors)
+                BottomBar(date = date, colors = colors, onOpenSelection = {viewModel.openSelection()})
             }
             LOADED -> {
-               // TopBar(viewModel = viewModel, date = date, colors)
+                // TopBar(viewModel = viewModel, date = date, colors)
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -114,24 +118,30 @@ fun DayScreen(
 
                     exerciseBundle.forEachIndexed { index, element ->
 
-                            ExpandableExerciseCard(
-                                movement = element.get(0),
-                                date = date.value,
-                                exercises = exerciseBundle.get(index)
-                            )
+                        ExpandableExerciseCard(
+                            movement = element.get(0),
+                            date = date.value,
+                            exercises = exerciseBundle.get(index),
+                            addSetHelp = {viewModel.addSetHelp(it)}
+                        )
 
                     }
 
 
                 }
-                Column(modifier = Modifier.background(Color.Transparent).fillMaxSize(), verticalArrangement = Arrangement.Bottom){
-                    BottomBar(viewModel = viewModel, date = date, colors = colors)
+                Column(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    BottomBar(date = date, colors = colors, onOpenSelection = {viewModel.openSelection()})
                 }
 
             }
             DayViewModel.DayScreenState.SELECT -> {
                 //viewModel.filterTypeList()
-                SelectionColumn(exerciseList = typeList.value, viewModel = viewModel)
+                SelectionColumn(exerciseList = typeList.value, updateViewModel = {viewModel.updateBundle(it)}, closeSelection = {viewModel.closeSelection()})
                 //Divider(modifier = Modifier.fillMaxWidth(1f))
             }
 
@@ -142,41 +152,45 @@ fun DayScreen(
 
 @Composable
 fun BottomBar(
-    viewModel: DayViewModel,
     date: MutableState<LocalDate>,
     colors: ColorScheme,
+    onOpenSelection: () -> Unit
 ) {
 
-        Row(
-            modifier = Modifier.fillMaxWidth(0.95f),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
+    Row(
+        modifier = Modifier.fillMaxWidth(0.95f),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FloatingActionButton(
+            onClick = onOpenSelection,
+            containerColor = colors.primaryContainer,
+            contentColor = colors.onPrimaryContainer
         ) {
-            FloatingActionButton(onClick = { viewModel.openSelection() }, containerColor = colors.primaryContainer, contentColor = colors.onPrimaryContainer) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "selectionview",
-                    tint = colors.primary
-                )
-            }
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "selectionview",
+                tint = colors.primary
+            )
         }
+    }
 
 }
 
 
 @Composable
 fun TopBar(
-    viewModel: DayViewModel,
+    updateDate: (LocalDate) -> Unit,
     date: MutableState<LocalDate>,
-    colors:ColorScheme
+    colors: ColorScheme
 ) {
     var exState by remember { mutableStateOf(false) }
     val formatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
     AnimatedVisibility(visible = exState, enter = fadeIn(), exit = fadeOut()) {
 
-        ExpandCalendar(updateDay = {
+        ExpandCalendar(updateDay = { it ->
             //date lambda
-            viewModel.updateDate(it) //updating vm
+            updateDate(it)
         })
     }
 
@@ -184,7 +198,8 @@ fun TopBar(
     //Holder for top bar buttons and stuff
     Row(
         modifier = Modifier
-            .padding(10.dp).fillMaxWidth(),
+            .padding(10.dp)
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -203,14 +218,14 @@ fun TopBar(
                 tint = colors.primary
             )
         }
-        Row(modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(formatter.format(date.value), color = colors.primary, modifier = Modifier)
         }
-        }
-
+    }
 }
 
 

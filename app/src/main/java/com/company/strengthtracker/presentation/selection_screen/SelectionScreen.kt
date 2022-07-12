@@ -20,7 +20,6 @@ import com.company.strengthtracker.data.entities.exercise_data.main_categories.A
 fun SelectionScreen(
     navController: NavController,
     viewModel: SelectionViewModel = hiltViewModel()
-
 ) {
 //    val searchBarState by viewModel.searchBarState
 //    val searchTextState by viewModel.searchTextState
