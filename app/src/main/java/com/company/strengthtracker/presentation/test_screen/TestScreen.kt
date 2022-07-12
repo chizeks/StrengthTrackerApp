@@ -2,8 +2,8 @@ package com.company.strengthtracker.presentation.test_screen
 
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.TextDelegate.Companion.paint
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,126 +11,161 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.company.strengthtracker.R
+import com.company.strengthtracker.presentation.test_screen.graph_utils.CoordinateFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TestScreen(
-    navController: NavController,
-    viewModel: TestViewModel = hiltViewModel()
-) {
-    val listX: List<Float> =
-        listOf(1f, 3f, 5f, 7f, 9f, 11f, 13f, 15f, 17f, 19f, 21f, 23f, 25f, 27f, 29f, 31f)
-    val listY: List<Float> =
-        listOf(25f, 25f, 30f, 35f, 40f, 45f, 52.5f, 50f, 50f, 52.5f, 55f, 50f, 60f, 60f, 65f, 65f)
-    val yMax = max(listY)
-    val xMax = max(listX)
+fun TestScreen(navController: NavController, viewModel: TestViewModel = hiltViewModel()) {
+    val listX = viewModel.listX
+    val listY = viewModel.listY
+    val xMax = listX.maxOrNull() ?: 0f
+    val yMax = listY.maxOrNull() ?: 0f
+    val xMin = listX.minOrNull() ?: 0f
+    val yMin = listY.minOrNull() ?: 0f
+    val colors = MaterialTheme.colorScheme
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Graph(listX = listX, listY = listY, yMax = yMax, xMax = xMax)
+        Graph(
+            listX = listX,
+            listY = listY,
+            yMax = yMax,
+            xMax = xMax,
+            yMin = yMin,
+            xMin = xMin,
+            coordinateFormatter = CoordinateFormatter(),
+            colors = colors,
+            padding = 50f
+        )
     }
 }
 
 /*x_0 = scaledXDist, x_1 += scaledXDist
-* y = (yMax - y)*(height/yMax)*/
+ * y = (yMax - y)*(height/yMax)*/
+/**/
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Graph(
     listX: List<Float>,
     listY: List<Float>,
     yMax: Float,
     xMax: Float,
+    yMin: Float,
+    xMin: Float,
+    padding: Float,
+    coordinateFormatter: CoordinateFormatter,
+    colors: ColorScheme,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .height(350.dp)
-            .width(350.dp)
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize())  {
-            val width = size.width
-            val height = size.height
-            drawLine(
-                start = Offset(0f, ((yMax - 0) * (height / yMax)).toFloat()),
-                end = Offset(width, ((yMax - 0) * (height / yMax)).toFloat()),
-                color = Color.Black,
-                strokeWidth = 5f
-            )
 
+    // pixel density ref for Paint
+    val density = LocalDensity.current
 
-            drawLine(
-                start = Offset(0f, ((yMax - 0) * (height / yMax))),
-                end = Offset(0f, (yMax - (yMax + 2)) * (height / yMax)),
-                color = Color.Black,
-                strokeWidth = 5f
-            )
-            var coordinateList: MutableList<Offset> = mutableListOf()
-            listY.forEachIndexed { i, it ->
-                coordinateList.add(
-                    Offset(
-                        x = listX[i] * (width / xMax),
-                        y = ((yMax - it) * (height / yMax))
-                    )
-                )
-//                cList.add(
-//                    Offset(
-//                        x = listX[i + 1] * (width / xMax),
-//                        y = ((yMax - listY[i + 1]) * (height / yMax))
-//                    )
-//                )
+    // textPaint to construct text objects within the graph
+    val textPaint =
+        remember(density) {
+            Paint().apply {
+                color = android.graphics.Color.WHITE
+                textAlign = Paint.Align.RIGHT
+                textSize = density.run { 12.sp.toPx() }
             }
+        }
+    // setting text anti alias to on
+    textPaint.isAntiAlias = true
 
-            for(i in listX.indices){
-                drawContext.canvas.nativeCanvas.drawText(
+    // box for strict width and height, this should be dynamix
+    Box(contentAlignment = Alignment.Center, modifier = Modifier
+        .aspectRatio(1f)
+        .fillMaxSize(0.9f)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.surfaceVariant),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Canvas(
+                modifier = Modifier.fillMaxSize(0.8f)
+            ) {
+                val width = size.width
+                val height = size.height
+                //                val xOffset = ((size.width * 0.5f) - (xMax * 0.5f))
+                val xOffset = ((xMax * 0.5f) - (size.width * 0.5f))
+                // x-axis
+                drawLine(
+                    start = Offset(padding - xMin, ((yMax) * (height / yMax)).toFloat()),
+                    end = Offset(width, ((yMax - 0) * (height / yMax)).toFloat()),
+                    color = Color.Black,
+                    strokeWidth = 5f
                 )
-            }
 
-            for (i in listY.indices) {
-                if (i + 1 < 16) {
-                    val x1 = ((listX[i]) * (width / xMax))
-                    val y1 = ((yMax - listY[i]) * (height / yMax))
-                    val x2 = ((listX[i + 1]) * (width / xMax))
-                    val y2 = ((yMax - listY[i + 1]) * (height / yMax))
-                    drawCircle(
-                        color = Color.Black,
-                        center = Offset(
-                            x = x1,
-                            y = y1
-                        ),
-                        radius = 8f
+                // y-axis
+                drawLine(
+                    start = Offset((padding - xMin), ((yMax - 0) * (height / yMax))),
+                    end = Offset(padding - xMin, (height / yMax)),
+                    //                color = Color.Black,
+                    color = colors.onSurface,
+                    strokeWidth = 5f
+                )
+
+                var stepSize = (height / yMax)
+                var increment = stepSize
+                var text = yMax
+                for (i in 0..yMax.toInt()) {
+                    if (i % 5 == 0 && text > 0f) {
+                        drawContext.canvas.nativeCanvas.drawText(
+                            "${text.toInt()}",
+                            (0.5f * (padding - xMin)),
+                            (stepSize + (0.3f * textPaint.textSize)),
+                            textPaint
+                        )
+                        drawLine(
+                            color = Color.Black,
+                            start = Offset(x = (padding - xMin) - 8f, y = stepSize),
+                            end = Offset(x = (padding - xMin) + 8f, y = stepSize),
+                            strokeWidth = 5f
+                        )
+                    }
+                    text -= 1f
+                    stepSize += increment
+                }
+
+                var coordinateList: MutableList<Offset> =
+                    coordinateFormatter.getCoordList(
+                        listX = listX,
+                        listY = listY,
+                        yMax = yMax,
+                        xMax = xMax,
+                        height = height,
+                        width = width,
+                        padding = padding
                     )
 
-
-                    drawLine(
-                        color = Color.Black,
-                        start = Offset(x1, y1),
-                        end = Offset(x2, y2),
-                        strokeWidth = 5f
-                    )
-//                    drawCircle(
-//                        color = Color.Black,
-//                        center = Offset(
-//                            x2, y2
-//                        ),
-//                        radius = 8f
-//                    )
+                for (i in coordinateList.indices) {
+                    if ((i + 1) < 16) {
+                        drawLine(
+                            color = colors.onSurface,
+                            start = coordinateList[i],
+                            end = coordinateList[i + 1],
+                            strokeWidth = 5f
+                        )
+                    }
+                }
+                for (i in coordinateList.indices) {
+                    drawCircle(color = colors.onSurfaceVariant, radius = 5f, center = coordinateList[i])
                 }
             }
         }
     }
 }
 
-
 fun max(list: List<Float>): Float {
     var max = 0f
-    list.forEach {
-        if (it > max)
-            max = it
-    }
+    list.forEach { if (it > max) max = it }
     return max
 }
