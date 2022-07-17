@@ -1,126 +1,279 @@
 package com.company.strengthtracker.presentation.progress_screen
 
+import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import java.util.*
+import com.company.strengthtracker.presentation.test_screen.graph_utils.CoordinateFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProgressScreen(
-    navController: NavController,
-    viewModel: ProgressViewModel = hiltViewModel()
-) {
-    val yStep = 50
-    val random = Random()
-    /* to test with random points */
-    val points = (0..9).map {
-        var num = random.nextInt(350)
-        if (num <= 50)
-            num += 100
-        num.toFloat()
-    }
-    /* to test with fixed points */
-//                val points = listOf(150f,100f,250f,200f,330f,300f,90f,120f,285f,199f),
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.DarkGray)
+fun TestScreen(navController: NavController, viewModel: ProgressViewModel = hiltViewModel()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Graph(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(500.dp),
-            xValues = (0..9).map { it + 1 },
-            yValues = (0..6).map { (it + 1) * yStep },
-            points = points,
-            paddingSpace = 16.dp,
-            verticalStep = yStep
-        )
+//        SingleLineGraph(
+//            listX = listX,
+//            listY = listY,
+//            yMax = yMax,
+//            xMax = xMax,
+//            yMin = yMin,
+//            xMin = xMin,
+//            coordinateFormatter = CoordinateFormatter(),
+//            colors = colors,
+//            padding = 50f
+//        )
     }
 }
 
-@Composable
-fun Graph(
-    modifier: Modifier,
-    xValues: List<Int>,
-    yValues: List<Int>,
-    points: List<Float>,
-    paddingSpace: Dp,
-    verticalStep: Int
-) {
-    Box(
-        modifier = modifier
-            .background(Color.White)
-            .padding(horizontal = 8.dp, vertical = 12.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Canvas(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            val xAxisSpace = (size.width - paddingSpace.toPx()) / xValues.size
-            val yAxisSpace = size.height / yValues.size
-            /** placing x axis points */
-            /** placing our x axis points */
-            for (i in points.indices) {
-                val x1 = xAxisSpace * xValues[i]
-                val y1 = size.height - (yAxisSpace * (points[i] / verticalStep.toFloat()))
-                /** drawing circles to indicate all the points */
-                drawCircle(
-                    color = Color.Red,
-                    radius = 10f,
-                    center = Offset(x1, y1)
-                )
-            }
-        }
-    }
-}
+
+//@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
-//fun GraphMainView(colors: ProgressViewModel.Colors) {
+//fun ComparisonGraph(
+//    xListInitial: List<Float>,
+//    xListCurrent: List<Float>,
+//    yListInitial: List<Float>,
+//    yListCurrent: List<Float>,
+//    totalYMax: Float,
+//    totalXMax: Float,
+//    totalXMin: Float,
+//    height: Float,
+//    width: Float,
+//    padding: Float,
+//    coordinateFormatter: CoordinateFormatter,
+//    colors: ColorScheme,
+//) {
 //
-//    Column(modifier = Modifier.fillMaxSize(0.9f)) {
-//        Canvas(
+//    // pixel density ref for Paint
+//    val density = LocalDensity.current
+//
+//    // textPaint to construct text objects within the graph
+//    val textPaint =
+//        remember(density) {
+//            Paint().apply {
+//                color = android.graphics.Color.WHITE
+//                textAlign = Paint.Align.RIGHT
+//                textSize = density.run { 12.sp.toPx() }
+//            }
+//        }
+//    // setting text anti alias to on
+//    textPaint.isAntiAlias = true
+//
+//    //box for maintaining 1:1 aspect ratio
+//    Box(
+//        contentAlignment = Alignment.Center, modifier = Modifier
+//            .aspectRatio(1f)
+//            .fillMaxSize(0.9f)
+//    ) {
+//        //Column for centering
+//        Column(
 //            modifier = Modifier
 //                .fillMaxSize()
-//                .background(MaterialTheme.colorScheme.background)
+//                .background(colors.surfaceVariant),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
 //        ) {
-//            val canvasHeight = size.height
-//            val canvasWidth = size.width
-//val verticalStep = 50f
-//            val xAxisSpace = (size.width)/6
-//            val yAxisSpace = (size.height)/5
-//            drawPoints(
-//                listOf(
-//                    Offset(x = xAxisSpace * 1f, y = size.height - (yAxisSpace) / 1f),
-//                    Offset(x = xAxisSpace * 2f, y = size.height - (yAxisSpace) / 1.5f),
-//                    Offset(x = xAxisSpace * 3f, y = size.height - (yAxisSpace) / 1.51f),
-//                    Offset(x = xAxisSpace * 4f, y = size.height - (yAxisSpace) / 2f),
-//                    Offset(x = xAxisSpace * 5f, y = size.height - (yAxisSpace) / 4f),
-//                ),
-//                pointMode = PointMode.Lines,
-//                strokeWidth = Stroke.DefaultMiter,
-//                colorFilter = ColorFilter.tint(color = Color.Black),
-//                brush = Brush.linearGradient(listOf(Color.Black, Color.Black))
-//            )
-////            drawLine(
-////                start = Offset(x = canvasWidth, y = 0f),
-////                end = Offset(x = 0f, y = canvasHeight),
-////                color = Color.Black
-////            )
+//            Canvas(
+//                modifier = Modifier.fillMaxSize(0.8f)
+//            ) {
+//                val width = size.width
+//                val height = size.height
+////TODO move the coordinate list formatting to an alternative class outside of composables
+//                val coordinateList: MutableList<Offset> =
+//                    coordinateFormatter.getComparisonCoordList(
+//                    )
+//                // x-axis
+//                drawLine(
+//                    start = Offset(padding - xMin, ((yMax) * (height / yMax)).toFloat()),
+//                    end = Offset(width, ((yMax - 0) * (height / yMax)).toFloat()),
+//                    color = Color.Black,
+//                    strokeWidth = 5f
+//                )
+//
+//                // y-axis
+//                drawLine(
+//                    start = Offset((padding - xMin), ((yMax - 0) * (height / yMax))),
+//                    end = Offset(padding - xMin, (height / yMax)),
+//                    color = colors.onSurface,
+//                    strokeWidth = 5f
+//                )
+//
+//                var stepSize = (height / yMax) //scaled measurement of '1' unit on graph
+//                var increment = stepSize
+//                var text = yMax
+//                for (i in 0..yMax.toInt()) {
+//                    if (i % 5 == 0 && text > 0f) {
+//                        drawContext.canvas.nativeCanvas.drawText(
+//                            "${text.toInt()}",
+//                            (0.5f * (padding - xMin)),
+//                            (stepSize + (0.3f * textPaint.textSize)),
+//                            textPaint
+//                        )
+//                        drawLine(
+//                            color = Color.Black,
+//                            start = Offset(x = (padding - xMin) - 8f, y = stepSize),
+//                            end = Offset(x = (padding - xMin) + 8f, y = stepSize),
+//                            strokeWidth = 5f
+//                        )
+//                    }
+//                    text -= 1f
+//                    stepSize += increment
+//                }
+//
+//
+//
+//                for (i in coordinateList.indices) {
+//                    if ((i + 1) < 16) {
+//                        drawLine(
+//                            color = colors.onSurface,
+//                            start = coordinateList[i],
+//                            end = coordinateList[i + 1],
+//                            strokeWidth = 5f
+//                        )
+//                    }
+//                }
+//                for (i in coordinateList.indices) {
+//                    drawCircle(color = colors.onSurfaceVariant, radius = 5f, center = coordinateList[i])
+//                }
+//            }
 //        }
 //    }
 //}
 
-//@Preview
-//@Composable
-//fun GraphPreview() {
-//    GraphMainView(colors = ProgressViewModel.Colors())
-//}
+/*x_0 = scaledXDist, x_1 += scaledXDist
+ * y = (yMax - y)*(height/yMax)*/
+/**/
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SingleLineGraph(
+    listX: List<Float>,
+    listY: List<Float>,
+    yMax: Float,
+    xMax: Float,
+    yMin: Float,
+    xMin: Float,
+    padding: Float,
+    coordinateFormatter: CoordinateFormatter,
+    colors: ColorScheme,
+) {
+
+    // pixel density ref for Paint
+    val density = LocalDensity.current
+
+    // textPaint to construct text objects within the graph
+    val textPaint =
+        remember(density) {
+            Paint().apply {
+                color = android.graphics.Color.WHITE
+                textAlign = Paint.Align.RIGHT
+                textSize = density.run { 12.sp.toPx() }
+            }
+        }
+    // setting text anti alias to on
+    textPaint.isAntiAlias = true
+
+    //box for maintaining 1:1 aspect ratio
+    Box(
+        contentAlignment = Alignment.Center, modifier = Modifier
+            .aspectRatio(1f)
+            .fillMaxSize(0.9f)
+    ) {
+        //Column for centering
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.surfaceVariant),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Canvas(
+                modifier = Modifier.fillMaxSize(0.8f)
+            ) {
+                val width = size.width
+                val height = size.height
+                //                val xOffset = ((size.width * 0.5f) - (xMax * 0.5f))
+//                val xOffset = ((xMax * 0.5f) - (size.width * 0.5f))
+
+                val coordinateList: MutableList<Offset> =
+                    coordinateFormatter.getCoordList(
+                        listX = listX,
+                        listY = listY,
+                        yMax = yMax,
+                        xMax = xMax,
+                        yMin = yMin,
+                        xMin = xMin,
+                        height = height,
+                        width = width,
+                        padding = padding
+                    )
+                // x-axis
+                drawLine(
+                    start = Offset(padding - xMin, ((yMax) * (height / yMax)).toFloat()),
+                    end = Offset(width, ((yMax - 0) * (height / yMax)).toFloat()),
+                    color = Color.Black,
+                    strokeWidth = 5f
+                )
+
+                // y-axis
+                drawLine(
+                    start = Offset((padding - xMin), ((yMax - 0) * (height / yMax))),
+                    end = Offset(padding - xMin, (height / yMax)),
+                    color = colors.onSurface,
+                    strokeWidth = 5f
+                )
+
+                var stepSize = (height / yMax) //scaled measurement of '1' unit on graph
+                var increment = stepSize
+                var text = yMax
+                for (i in 0..yMax.toInt()) {
+                    if (i % 5 == 0 && text > 0f) {
+                        drawContext.canvas.nativeCanvas.drawText(
+                            "${text.toInt()}",
+                            (0.5f * (padding - xMin)),
+                            (stepSize + (0.3f * textPaint.textSize)),
+                            textPaint
+                        )
+                        drawLine(
+                            color = Color.Black,
+                            start = Offset(x = (padding - xMin) - 8f, y = stepSize),
+                            end = Offset(x = (padding - xMin) + 8f, y = stepSize),
+                            strokeWidth = 5f
+                        )
+                    }
+                    text -= 1f
+                    stepSize += increment
+                }
+
+
+
+                for (i in coordinateList.indices) {
+                    if ((i + 1) < 16) {
+                        drawLine(
+                            color = colors.onSurface,
+                            start = coordinateList[i],
+                            end = coordinateList[i + 1],
+                            strokeWidth = 5f
+                        )
+                    }
+                }
+                for (i in coordinateList.indices) {
+                    drawCircle(color = colors.onSurfaceVariant, radius = 5f, center = coordinateList[i])
+                }
+            }
+        }
+    }
+}
+

@@ -5,7 +5,6 @@ import android.util.Log
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
 import com.company.strengthtracker.domain.repository.SetRepository
 import com.company.strengthtracker.domain.util.Resource
-import java.time.LocalDate
 import javax.inject.Inject
 
 class AddSetToLogUseCase @Inject constructor(
@@ -13,11 +12,11 @@ class AddSetToLogUseCase @Inject constructor(
 ){
     suspend fun addSet(
         movement: AllExercises,
-        date: LocalDate,
+        date: Long,
         userUid: String,
         dateString: String = date.toString()
     ):Resource<String> {
-        val dateIndex = hashMapOf("date" to date)
+        val dateDbIndex = hashMapOf("date" to date)
         val fields = hashMapOf(
             "name" to movement.name,
             "exType" to movement.exType.toString()
@@ -27,7 +26,7 @@ class AddSetToLogUseCase @Inject constructor(
 
         return when(setRepositoryImpl.createLogPath(
             fields,
-            dateIndex = dateIndex,
+            dateIndex = dateDbIndex,
             userUid,
             dateString,
             exType = movement.exType.toString(),

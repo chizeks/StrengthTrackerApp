@@ -11,10 +11,9 @@ interface SetRepository {
 //        date: String,
 //        userUid: String
 //    ):Resource<MutableList<MutableList<AllExercises>>>
-    suspend fun getHistory(dateStart:LocalDate, dateEnd:LocalDate, userUid:String):Resource<QuerySnapshot>
     suspend fun createLogPath(
         fields: HashMap<String, String>,
-        dateIndex: HashMap<String, LocalDate>,
+        dateIndex: HashMap<String, Long>,
         userUid: String,
         date: String,
         name: String,

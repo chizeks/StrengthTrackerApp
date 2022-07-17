@@ -1,4 +1,3 @@
-
 package com.company.strengthtracker.domain.use_cases
 
 import com.company.strengthtracker.data.entities.exercise_data.main_categories.AllExercises
@@ -13,13 +12,13 @@ class UpdateViewmodelLogUseCase @Inject constructor(
     private val setRepositoryImpl: SetRepository
 ) {
     suspend fun updateViewLog(
-        date:String,
-        userUid:String,
-    ):Resource<MutableList<MutableList<AllExercises>>>{
-        val bundle:MutableList<MutableList<AllExercises>> = mutableListOf()
+        date: String,
+        userUid: String,
+    ): Resource<MutableList<MutableList<AllExercises>>> {
+        val bundle: MutableList<MutableList<AllExercises>> = mutableListOf()
 
         val response = setRepositoryImpl.getAllExerciseSubcollection(date = date, userUid = userUid)
-        when(response) {
+        when (response) {
             is Resource.Success -> {
                 response.data.documents.forEach { exerciseCategory ->
                     val setsRef = setRepositoryImpl.getSetSubcollection(
@@ -27,22 +26,23 @@ class UpdateViewmodelLogUseCase @Inject constructor(
                         userUid,
                         exerciseCategory.get("name").toString()
                     )
-                    when(setsRef) {
+                    when (setsRef) {
                         is Resource.Success -> {
                             //setsRef.data.documents.forEach {
 
-                                val collect = collectDataFromLog(
-                                    setsRef = setsRef.data,
-                                    exType = exerciseCategory.get("exType").toString(), setBundle = mutableListOf())
+                            val collect = collectDataFromLog(
+                                setsRef = setsRef.data,
+                                exType = exerciseCategory.get("exType").toString(), setBundle = mutableListOf()
+                            )
 
-                                when(collect){
-                                    is Resource.Success -> {
-                                        bundle.add(collect.data)
-                                    }
-                                    is Resource.Error -> {
-                                        return Resource.Error(message = collect.message)
-                                    }
+                            when (collect) {
+                                is Resource.Success -> {
+                                    bundle.add(collect.data)
                                 }
+                                is Resource.Error -> {
+                                    return Resource.Error(message = collect.message)
+                                }
+                            }
                             //}
                         }
                         is Resource.Error -> {
@@ -59,49 +59,46 @@ class UpdateViewmodelLogUseCase @Inject constructor(
     }
 
 
-    private suspend fun collectDataFromLog(
-        setBundle:MutableList<AllExercises>,
+    private fun collectDataFromLog(
+        setBundle: MutableList<AllExercises>,
         setsRef: QuerySnapshot,
-        exType:String,
+        exType: String,
     ): Resource<MutableList<AllExercises>> {
         setsRef.documents.forEach { set ->
-                //Create objects based off of fields in documents
-                if (set != null) {
-                    if (exType == "STATIC") {
-                        setBundle.add(
-                            Statics(
-                                name = set.get("name") as String,
-                                holdTime = set.get("holdTime") as String,
-                                weight = set.get("weight") as String,
-                                sir = set.get("sir") as String,
-                                progression = set.get("progression") as String,
-                                setNumber = set.get("setNumber") as Long,
-                                iconId = -1,
-                                properties = set.get("properties") as MutableMap<String, Boolean>
-                            )
+            //Create objects based off of fields in documents
+            if (set != null) {
+                if (exType == "STATIC") {
+                    setBundle.add(
+                        Statics(
+                            name = set.get("name") as String,
+                            holdTime = set.get("holdTime") as String,
+                            weight = set.get("weight") as String,
+                            sir = set.get("sir") as String,
+                            progression = set.get("progression") as String,
+                            setNumber = set.get("setNumber") as Long,
+                            reps = set.get("reps") as String,
+                            iconId = -1,
+                            properties = set.get("properties") as MutableMap<String, Boolean>
                         )
-                    }
-                    if (exType == "DYNAMIC") {
-                        setBundle.add(
-                            Dynamics(
-                                name = set.get("name") as String,
-                                weight = set.get("weight") as String,
-                                reps = set.get("reps") as String,
-                                rir = set.get("rir") as String,
-                                setNumber = set.get("setNumber") as Long,
-                                iconId = -1,
-                                properties = set.get("properties") as MutableMap<String, Boolean>
-                            )
-                        )
-                    }
+                    )
                 }
-            else return Resource.Error("Error getting set data")
+                if (exType == "DYNAMIC") {
+                    setBundle.add(
+                        Dynamics(
+                            name = set.get("name") as String,
+                            weight = set.get("weight") as String,
+                            reps = set.get("reps") as String,
+                            rir = set.get("rir") as String,
+                            setNumber = set.get("setNumber") as Long,
+                            iconId = -1,
+                            properties = set.get("properties") as MutableMap<String, Boolean>
+                        )
+                    )
+                }
+            } else return Resource.Error("Error getting set data")
         }
         return Resource.Success(setBundle)
     }
-
-
-
 
 
 }
@@ -130,7 +127,7 @@ class UpdateViewmodelLogUseCase @Inject constructor(
 //                    is Resource.Error -> DayViewModel.DayScreenState.LAUNCH
 //                }
 //            }
-////            _dayScreenState.value = DayScreenState.LOADED
+//    _dayScreenState.value = DayScreenState.LOADED
 //        }
 //
 //    }
