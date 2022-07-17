@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
                 // NavHost defines all possible screens
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.TestScreen.route
+                    startDestination = Screen.LoginScreen.route
                 ) {
                     // Each composable() represents a Screen; pass in composable which represent screen
                     composable(route = Screen.LoginScreen.route) {

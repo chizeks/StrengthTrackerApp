@@ -67,32 +67,32 @@ fun DayScreen(
                     durationMillis = 300
                 )
             )
-            .background(color = colors.background),
+            .background(color = MaterialTheme.colorScheme.background),
 
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) { //fades in/out child element
-        TopBar(updateDate = {viewModel.updateDate(it)}, date = date, colors = colors)
-        Button(onClick = { /*TODO*/ }) {
-            
-        }
+
         when (screenState) {
             LAUNCH -> {
                 //TopBar(viewModel = viewModel, date = date, colors)
-
+                TopBar(updateDate = {viewModel.updateDate(it)}, date = date, colors = colors)
             }
             LOADING -> {
-
+                TopBar(updateDate = {viewModel.updateDate(it)}, date = date, colors = colors)
 
             }
+            //error retrieving log
             ERROR -> {
                 Text("Error")
                 scope.launch {
                     snackbarHostState.showSnackbar("There was an error retrieving log data for this day")
                 }
             }
+            //log retrieved is empty
             EMPTY -> {
-                //TopBar(viewModel = viewModel, date = date, colors)
+
+                TopBar(updateDate = {viewModel.updateDate(it)}, date = date, colors = colors)
                 Column(
                     modifier = Modifier.fillMaxHeight(0.9f),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -101,15 +101,17 @@ fun DayScreen(
                     Text(
                         modifier = Modifier.alpha(0.5f),
                         text = "Empty day...",
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
 
                 }
                 BottomBar(date = date, colors = colors, onOpenSelection = {viewModel.openSelection()})
             }
+            //log retrieved is non-empty
             LOADED -> {
-                // TopBar(viewModel = viewModel, date = date, colors)
 
+                TopBar(updateDate = {viewModel.updateDate(it)}, date = date, colors = colors)
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.SpaceEvenly,
@@ -120,9 +122,9 @@ fun DayScreen(
 
                         ExpandableExerciseCard(
                             movement = element.get(0),
-                            date = date.value,
                             exercises = exerciseBundle.get(index),
-                            addSetHelp = {viewModel.addSetHelp(it)}
+                            addSetHelp = {viewModel.addSetHelp(it)},
+                            navController = navController
                         )
 
                     }
